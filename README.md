@@ -44,3 +44,6 @@ Duration: Oct 18 – Nov 1
 Goals:
 Design user interface mockups
 Build and connect the user database?
+
+Sprint 3: 
+Duration: Nov
