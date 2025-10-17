@@ -46,4 +46,4 @@ Design user interface mockups
 Build and connect the user database?
 
 Sprint 3: 
-Duration: Nov
+Duration: Nov 
