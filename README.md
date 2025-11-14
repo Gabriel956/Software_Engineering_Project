@@ -45,5 +45,8 @@ Goals:
 Design user interface mockups
 Build and connect the user database?
 
-Sprint 3: 
-Duration: Nov 
+Sprint 3: Frontend Systems
+Duration: Nov 2 - Nov 15
+Goals:
+Work on how site should look
+Finalize login?
