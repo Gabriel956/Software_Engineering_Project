@@ -47,6 +47,9 @@ class Event(models.Model):
         return self.title
     
 class RSVP(models.Model):
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=['user', 'event'], name='unique_rsvp')]
+        
     GOING = 'going'
     MAYBE = 'maybe'
     NO = 'no'
