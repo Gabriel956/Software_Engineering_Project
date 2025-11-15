@@ -1,9 +1,12 @@
 # app/views.py
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.utils import timezone
-from .models import Event  # ← add Comment, Interest later if you need
+from .models import Event  
+from django.forms import ModelForm
+from django import forms
 
 def login_events(request):
     # If user is already logged in, show events screen
@@ -55,3 +58,44 @@ def signup(request):
         form = UserCreationForm()
 
     return render(request, "app/signup.html", {"form": form})
+
+
+
+class EventForm(ModelForm):
+    class Meta:
+        model = Event
+        fields = ['title', 'description', 'location', 'starts_at', 'capacity', 'visibility', 'interests']
+        widgets = {
+            'starts_at': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        }
+
+@login_required
+def event_create(request):
+    profile = request.user.profile
+
+    if request.method == "POST":
+        form = EventForm(request.POST)
+        if form.is_valid():
+            event = form.save(commit=False)
+            event.host = profile
+
+            event.starts_at = form.cleaned_data['starts_at']
+            
+            event.save()
+            form.save_m2m()
+            return redirect("event_detail", event_id=event.id)   # <— Redirect is valid response!
+    else:
+        form = EventForm()
+
+    return render(request, "app/event_form.html", {"form": form})
+
+@login_required
+def event_detail(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    return render(request, "app/event_detail.html", {"event": event})
+
+@login_required
+def event_list(request):
+    events = Event.objects.order_by('starts_at')
+    return render(request, "app/event_list.html", {"events": events})
+

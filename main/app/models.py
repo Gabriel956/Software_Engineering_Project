@@ -9,6 +9,12 @@ User = settings.AUTH_USER_MODEL
 # profile model need name, email, phone number, birthday 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    fullname = models.CharField(max_length=100, blank=True)
+    birthday = models.DateField(blank=True, null=True)
+    phone_number = models.CharField(max_length=20, blank=True)
+
+
     display_name = models.CharField(max_length=30, blank=True)
     bio = models.TextField(blank=True)
 
@@ -19,6 +25,9 @@ class Profile(models.Model):
     
 class Interest(models.Model):
     name = models.CharField(max_length=50, unique=True)
+
+    class Meta:
+        ordering = ['name']
 
     def __str__(self):
         return self.name
@@ -33,15 +42,24 @@ class Event(models.Model):
 
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True)
+
     host = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='hosted_events')
 
     location = models.CharField(max_length=255)
     starts_at = models.DateTimeField()
+
     capacity = models.PositiveIntegerField()
+
     visibility = models.CharField(max_length=10, choices=VISIBILITY_CHOICES, default=PUBLIC)
     interests = models.ManyToManyField(Interest, blank=True, related_name='events')
 
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['starts_at']
+        indexes = [
+            models.Index(fields=['starts_at']),
+        ]
 
     def __str__(self):
         return self.title
@@ -69,6 +87,12 @@ class Comment(models.Model):
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
     body = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f'Comment by {self.user.display_name} on {self.event.title}'
 
 
 
