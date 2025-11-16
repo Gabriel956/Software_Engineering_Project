@@ -1,4 +1,11 @@
 # Software_Engineering_Project
+Current info:
+admin 
+admin956
+
+current build is frontend-1
+
+
 
 App name: in the works
 
