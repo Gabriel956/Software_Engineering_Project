@@ -55,3 +55,13 @@ def signup(request):
         form = UserCreationForm()
 
     return render(request, "app/signup.html", {"form": form})
+
+def profile(request):
+    
+    
+    return render(request, "app/profile.html")
+
+def events(request):
+    
+    
+    return render(request, "app/events.html")

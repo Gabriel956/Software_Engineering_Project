@@ -1,9 +1,10 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>In the Works — Login & Events</title>
+  <title>In the Works — Profile</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
@@ -98,7 +99,7 @@
     }
 
     .events-section {
-      display: none;
+      
       padding: 40px 60px;
     }
 
@@ -136,18 +137,27 @@
 
     .event-card {
       display: flex;
-      background: #e2e2e2;
+      
       padding: 18px;
       margin-bottom: 28px;
-      align-items: center;
+      align-items: right;
       gap: 16px;
       break-inside: avoid;
+      
     }
 
-    .event-thumb {
-      width: 86px;
-      height: 86px;
+    .profile-thumb {
+      width: 200px;
+      height: 200px;
       background: #111;
+      margin-top: 50px;
+      margin-left: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 48px;
     }
 
     .event-meta {
@@ -161,8 +171,16 @@
     }
 
     .event-desc {
-      font-size: 13px;
+      font-size: 18px;
       margin-bottom: 10px;
+      position: relative;
+      left: 160px;
+      top: 70px;
+      background: #dbdbdb;
+      width: 500px;
+      height 700px;
+      padding: 20px;
+      margin-bottom: 50px;
     }
 
     .event-date {
@@ -178,26 +196,10 @@
   </style>
 </head>
 
-<body>
 
-  <div class="login-wrap" id="loginWrap">
-    <div class="login-card">
-      <h1 class="title">Login</h1>
-      <form class="px-4" onsubmit="return false;">
-        <div class="mb-3">
-          <input type="text" class="form-control custom-input" placeholder="Username">
-        </div>
-        <div class="mb-1">
-          <input type="password" class="form-control custom-input" placeholder="Password">
-        </div>
-        <a href="#" class="create-link">Create Account</a>
-        <div class="btn-row">
-          <button class="btn btn-custom" id="signup">Sign Up</button>
-          <button class="btn btn-custom" id="login">Login</button>
-        </div>
-      </form>
-    </div>
-  </div>
+
+
+<body>
 
 
   <div class="events-section" id="eventsSection">
@@ -206,72 +208,34 @@
       <button class="avatar btn bun-custom">G</button>
     </div>
 
-    <div class="events-grid">
-
-
-      <div class="event-card">
+  <!--<div class="event-card">
         <div class="event-thumb"></div>
         <div class="event-meta">
           <div class="event-title">Title</div>
           <div class="event-desc">Description of Event</div>
           <div class="event-date">Date/time</div>
         </div>
+   </div>-->
+    
+    <div class="event-card">
+      <div class="profile-thumb">G</div>
+
+      <div class="event-meta">
+        <div class="event-desc">Profile Info</div>
+        <div class="event-desc">Profile Info</div>
+        <div class="event-desc">Profile Info</div>
+
       </div>
-
-      <div class="event-card">
-        <div class="event-thumb"></div>
-        <div class="event-meta">
-          <div class="event-title">Title</div>
-          <div class="event-desc">Description of Event</div>
-          <div class="event-date">Date/time</div>
-        </div>
-      </div>
-
-      <div class="event-card">
-        <div class="event-thumb"></div>
-        <div class="event-meta">
-          <div class="event-title">Title</div>
-          <div class="event-desc">Description of Event</div>
-          <div class="event-date">Date/time</div>
-        </div>
-      </div>
-
-      <div class="event-card">
-        <div class="event-thumb"></div>
-        <div class="event-meta">
-          <div class="event-title">Title</div>
-          <div class="event-desc">Description of Event</div>
-          <div class="event-date">Date/time</div>
-        </div>
-      </div>
-
-
-
-
     </div>
+
+
+
+
+<!--background: #e2e2e2;-->
+    
+
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-
-    gsap.from('.title', { y: -20, opacity: 0, duration: 0.6 });
-    gsap.from('.custom-input', { y: 20, opacity: 0, stagger: 0.15 });
-    gsap.from('.create-link', { opacity: 0, y: 10, delay: 0.4 });
-    gsap.from('.btn-row button', { opacity: 0, y: 15, stagger: 0.1, delay: 0.5 });
-
-    document.getElementById('login').addEventListener('click', () => {
-      gsap.to('#loginWrap', {
-        opacity: 0, duration: 0.5, onComplete: () => {
-          document.getElementById('loginWrap').style.display = 'none';
-          document.getElementById('eventsSection').style.display = 'block';
-          gsap.from('.event-card', { opacity: 0, y: 20, stagger: 0.1, duration: 0.6 });
-          gsap.from('.brand-box', { x: -20, opacity: 0, duration: 0.6 });
-          gsap.from('.avatar', { x: 20, opacity: 0, duration: 0.6 });
-        }
-      });
-    });
-  </script>
-
 </body>
+
 </html>
