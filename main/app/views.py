@@ -22,7 +22,7 @@ def login_events(request):
             },
         )
 
-    Events = Event.objects.all
+    events = Event.objects.all
     error = None
 
     if request.method == "POST":
@@ -42,7 +42,7 @@ def login_events(request):
         {
             "error": error,
             "logged_in": False,
-            "Events": Events,
+            "events": events,
         },
     )
 
