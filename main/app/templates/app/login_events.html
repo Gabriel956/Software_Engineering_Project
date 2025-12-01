@@ -126,6 +126,7 @@
       align-items: center;
       justify-content: center;
       font-weight: 700;
+      text-decoration: none;
     }
 
     .events-grid {
@@ -158,6 +159,7 @@
       font-size: 20px;
       font-weight: 600;
       margin-bottom: 6px;
+      text-decoration: none;
     }
 
     .event-desc {
@@ -203,8 +205,8 @@
   <div class="events-section" id="eventsSection">
     <div class="topbar">
       <div class="brand-box"></div>
-      <a href="{% url 'profile' %}">
-      <button class="avatar btn bun-custom">G</button>
+      <a href="{% url 'profile' %}" style="text-decoration: none;">
+      <button class="avatar btn bun-custom" >G</button>
       </a>
     </div>
 
@@ -236,7 +238,9 @@
       <div class="event-card">
         <div class="event-thumb"></div>
         <div class="event-meta">
+          <a href="{% url 'events' i.id %}" style="text-decoration: none;">
           <div class="event-title">{{i.title}}</div>
+          </a>
           <div class="event-desc">{{i.description}}</div>
           <div class="event-date">{{i.starts_at}}</div>
         </div>

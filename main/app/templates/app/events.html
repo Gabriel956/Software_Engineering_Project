@@ -206,7 +206,10 @@
   <div class="events-section" id="eventsSection">
     <div class="topbar">
       <div class="brand-box"></div>
-      <button class="avatar btn bun-custom">G</button>
+
+      <a href="{% url 'profile' %}" style="text-decoration: none;">
+      <button class="avatar btn bun-custom" >G</button>
+      </a>
     </div>
 
   <!--<div class="event-card">
@@ -222,7 +225,8 @@
       <div class="profile-thumb">img</div>
 
       <div class="event-meta">
-        <div class="event-desc">Event description and details</div>
+        <div class="event-title">{{ id.title }}</div>
+        <div class="event-desc">{{id.description}}</div>
         
 
       </div>

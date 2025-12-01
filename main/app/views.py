@@ -1,5 +1,5 @@
 # app/views.py
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import UserCreationForm
 from django.utils import timezone
@@ -63,7 +63,7 @@ def profile(request):
     
     return render(request, "app/profile.html")
 
-def events(request):
+def events(request, id):
     
-    
-    return render(request, "app/events.html")
+    id = get_object_or_404(Event, pk=id)
+    return render(request, "app/events.html", {"id": id})
