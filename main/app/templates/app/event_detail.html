@@ -1,9 +1,56 @@
-<h1>{{ event.title }}</h1>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{ event.title }} — Event Detail</title>
+</head>
+<body>
 
-<p><strong>Description:</strong> {{ event.description }}</p>
-<p><strong>Location:</strong> {{ event.location }}</p>
-<p><strong>Starts At:</strong> {{ event.starts_at }}</p>
-<p><strong>Hosted by:</strong> {{ event.host.display_name }}</p>
+  <!-- Basic event info -->
+  <h1>{{ event.title }}</h1>
 
-<p><a href="/events/create/">Create another event</a></p>
-<p><a href="/admin/">Back to admin</a></p>
+  <p><strong>Description:</strong> {{ event.description }}</p>
+  <p><strong>Location:</strong> {{ event.location }}</p>
+  <p><strong>Starts At:</strong> {{ event.starts_at }}</p>
+  <p><strong>Hosted by:</strong> {{ event.host.display_name }}</p>
+
+  <p>
+    <a href="{% url 'event_list' %}">← Back to all events</a> |
+    <a href="{% url 'event_create' %}">Create another event</a> |
+    <a href="/admin/">Admin</a>
+  </p>
+
+  <hr>
+
+  <!-- RSVP section -->
+  <h2>RSVP</h2>
+
+  {% if my_rsvp %}
+    <p><strong>Your RSVP:</strong> {{ my_rsvp.get_status_display }}</p>
+  {% else %}
+    <p><strong>Your RSVP:</strong> You haven't RSVPed yet.</p>
+  {% endif %}
+
+  <form method="post" action="{% url 'rsvp_event' event.id %}">
+    {% csrf_token %}
+    <button type="submit" name="status" value="going">Going</button>
+    <button type="submit" name="status" value="maybe">Maybe</button>
+    <button type="submit" name="status" value="no">Not going</button>
+  </form>
+
+  <hr>
+
+  <!-- Attendees list -->
+  <h3>Attendees</h3>
+  <ul>
+    {% for rsvp in attendees %}
+      <li>
+        {{ rsvp.user.display_name }} — {{ rsvp.get_status_display }}
+      </li>
+    {% empty %}
+      <li>No RSVPs yet.</li>
+    {% endfor %}
+  </ul>
+
+</body>
+</html>

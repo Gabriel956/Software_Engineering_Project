@@ -4,50 +4,32 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.utils import timezone
-from .models import Event  
+from .models import Event, Profile, Interest, RSVP, Comment
 from django.forms import ModelForm
 from django import forms
 
 def login_events(request):
-    # If user is already logged in, show events screen
+    # If already logged in, go straight to events
     if request.user.is_authenticated:
-        events = (
-            Event.objects.filter(starts_at__gte=timezone.now())
-            .order_by("starts_at")
-        )
-        # You can also prefetch rsvps/comments for efficiency later
-        return render(
-            request,
-            "app/login_events.html",
-            {
-                "events": events,
-                "logged_in": True,
-            },
-        )
+        return redirect("event_list")
 
-    events = Event.objects.all
     error = None
 
     if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
+        username = request.POST.get("username", "").strip()
+        password = request.POST.get("password", "")
 
         user = authenticate(request, username=username, password=password)
+
         if user is not None:
             login(request, user)
-            return redirect("login_events")
+            return redirect("event_list")   # show events AFTER login
         else:
             error = "Invalid username or password."
 
-    return render(
-        request,
-        "app/login_events.html",
-        {
-            "error": error,
-            "logged_in": False,
-            "events": events,
-        },
-    )
+    # Just show login form (no events here)
+    return render(request, "app/login_events.html", {"error": error})
+
 
 def signup(request):
     if request.method == "POST":
@@ -61,7 +43,6 @@ def signup(request):
 
     return render(request, "app/signup.html", {"form": form})
 
-<<<<<<< HEAD
 
 
 class EventForm(ModelForm):
@@ -95,21 +76,38 @@ def event_create(request):
 @login_required
 def event_detail(request, event_id):
     event = get_object_or_404(Event, id=event_id)
-    return render(request, "app/event_detail.html", {"event": event})
+
+    #gets users rsvp status for the event
+    my_rsvp = RSVP.objects.filter(user=request.user.profile, event=event).first()
+
+    #attendees list
+    attendees = event.rsvps.select_related('user')
+
+    return render(request,"app/event_detail.html",{"event": event,"my_rsvp": my_rsvp,"attendees": attendees,},)
 
 @login_required
 def event_list(request):
     events = Event.objects.order_by('starts_at')
     return render(request, "app/event_list.html", {"events": events})
 
-=======
-def profile(request):
-    
-    
-    return render(request, "app/profile.html")
+@login_required
+def profile_view(request):
+    profile = request.user.profile
+    return render(request, "app/profile.html", {"profile": profile})
 
-def events(request, id):
-    
-    id = get_object_or_404(Event, pk=id)
-    return render(request, "app/events.html", {"id": id})
->>>>>>> 2123a0acd1f7833841a5be1974fa9242bb62f671
+@login_required
+def rsvp_event(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    profile = request.user.profile
+
+    if request.method == "POST":
+        status = request.POST.get("status")
+
+        if status in dict(RSVP.STATUS_CHOICES):
+            RSVP.objects.update_or_create(
+                user=profile,
+                event=event,
+                defaults={"status": status},
+            )
+    return redirect("event_detail", event_id=event.id)
+
