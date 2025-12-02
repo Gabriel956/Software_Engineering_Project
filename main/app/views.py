@@ -25,6 +25,7 @@ def login_events(request):
             },
         )
 
+    events = Event.objects.all
     error = None
 
     if request.method == "POST":
@@ -44,6 +45,7 @@ def login_events(request):
         {
             "error": error,
             "logged_in": False,
+            "events": events,
         },
     )
 
@@ -59,6 +61,7 @@ def signup(request):
 
     return render(request, "app/signup.html", {"form": form})
 
+<<<<<<< HEAD
 
 
 class EventForm(ModelForm):
@@ -99,3 +102,14 @@ def event_list(request):
     events = Event.objects.order_by('starts_at')
     return render(request, "app/event_list.html", {"events": events})
 
+=======
+def profile(request):
+    
+    
+    return render(request, "app/profile.html")
+
+def events(request, id):
+    
+    id = get_object_or_404(Event, pk=id)
+    return render(request, "app/events.html", {"id": id})
+>>>>>>> 2123a0acd1f7833841a5be1974fa9242bb62f671
