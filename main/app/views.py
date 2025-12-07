@@ -3,8 +3,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 from django.utils import timezone
-from .models import Event, Profile, Interest, RSVP, Comment
+from .models import Event, RSVP, Comment, Interest, Profile
 from django.forms import ModelForm
 from django import forms
 
@@ -43,15 +44,68 @@ def signup(request):
 
     return render(request, "app/signup.html", {"form": form})
 
+class SignUpForm(UserCreationForm):
+    display_name = forms.CharField(max_length = 20, required=False, label = 'Display Name')
+    bio = forms.CharField(widget = forms.Textarea, required=False, label = 'Bio')
+    interests = forms.ModelMultipleChoiceField(queryset=Interest.objects.all(), widget=forms.CheckboxSelectMultiple, required=False, label='Interests')
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password1', 'password2', 'display_name', 'bio', 'interests')
+
+def signup(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            #creates the user
+            user = form.save()
+            #creates the profile
+            profile = user.profile
+            #fill in extra profile info
+            profile.display_name = form.cleaned_data.get('display_name', '')
+            profile.bio = form.cleaned_data.get('bio', '')
+            profile.save()
+
+            #set many-to-many interests
+            interests = form.cleaned_data.get('interests')
+            if interests:
+                profile.interests.set(interests)
+
+            #log the user in immediately after signup
+            login(request, user)
+
+            #redirect to events page
+            return redirect('event_list')
+    else:
+        form = SignUpForm()
+
+    return render(request, 'app/signup.html', {'form': form})
+
+
+
 
 
 class EventForm(ModelForm):
     class Meta:
         model = Event
-        fields = ['title', 'description', 'location', 'starts_at', 'capacity', 'visibility', 'interests']
+        fields = [
+            'title',
+            'description',
+            'location',
+            'starts_at',
+            'capacity',
+            'visibility',
+            'interests',
+        ]
         widgets = {
             'starts_at': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'interests': forms.CheckboxSelectMultiple(), # multi-select dropdown
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Load all available interests for dropdown
+        self.fields['interests'].queryset = Interest.objects.all()
 
 @login_required
 def event_create(request):

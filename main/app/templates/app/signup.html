@@ -59,25 +59,16 @@
     .form-control.custom-input {
       background: #dcdcdc;
       border: 0;
-      height: 60px;
+      height: 48px;
       border-radius: 2px;
       box-shadow: none;
       padding-left: 18px;
       padding-right: 18px;
+      font-size: 14px;
     }
 
     .form-control.custom-input::placeholder {
       color: #7b7b7b;
-    }
-
-    .create-link {
-      display: block;
-      text-align: left;
-      margin-top: 8px;
-      margin-bottom: 18px;
-      font-size: 12px;
-      color: #0d6efd;
-      text-decoration: none;
     }
 
     .btn-custom {
@@ -89,101 +80,125 @@
       box-shadow: 0 3px 0 rgba(0, 0, 0, 0.25);
       font-size: 14px;
       min-width: 90px;
+      margin-top: 10px;
     }
 
-    .btn-row {
-      display: flex;
-      gap: 18px;
-      justify-content: center;
+    .field-label {
+      text-align: left;
+      font-size: 13px;
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+
+    .errorlist {
+      color: #dc3545;
+      list-style: none;
+      padding-left: 0;
+      margin-bottom: 0.25rem;
+      text-align: left;
+      font-size: 12px;
+    }
+
+    .interests-wrapper {
+      text-align: left;
+      font-size: 13px;
+      max-height: 180px;
+      overflow-y: auto;
+      padding: 8px;
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+
+    .back-link {
       margin-top: 12px;
-    }
-
-    .events-section {
-      display: none;
-      padding: 40px 60px;
-    }
-
-    .topbar {
-      height: 80px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 28px;
-    }
-
-    .brand-box {
-      width: 360px;
-      height: 60px;
-      background: #dbdbdb;
-    }
-
-    .avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: #111;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-    }
-
-    .events-grid {
-      column-count: 2;
-      column-gap: 70px;
-      margin-top: 20px;
-    }
-
-    .event-card {
-      display: flex;
-      background: #e2e2e2;
-      padding: 18px;
-      margin-bottom: 28px;
-      align-items: center;
-      gap: 16px;
-      break-inside: avoid;
-    }
-
-    .event-thumb {
-      width: 86px;
-      height: 86px;
-      background: #111;
-    }
-
-    .event-meta {
-      flex: 1;
-    }
-
-    .event-title {
-      font-size: 20px;
-      font-weight: 600;
-      margin-bottom: 6px;
-    }
-
-    .event-desc {
       font-size: 13px;
-      margin-bottom: 10px;
-    }
-
-    .event-date {
-      font-size: 13px;
-      color: #333;
-    }
-
-    @media(max-width:1000px) {
-      .events-grid {
-        column-count: 1;
-      }
     }
   </style>
 </head>
-<p>This is to sign up</p>
-
-
 
 <body>
 
-</body>
+  <div class="login-wrap">
+    <div class="login-card">
+      <h1 class="title">Sign Up</h1>
 
+      <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <!-- Username -->
+        <div class="mb-3">
+          <div class="field-label">
+            {{ form.username.label_tag }}
+          </div>
+          {{ form.username.errors }}
+          {{ form.username }}
+        </div>
+
+        <!-- Email -->
+        <div class="mb-3">
+          <div class="field-label">
+            {{ form.email.label_tag }}
+          </div>
+          {{ form.email.errors }}
+          {{ form.email }}
+        </div>
+
+        <!-- Password 1 -->
+        <div class="mb-3">
+          <div class="field-label">
+            {{ form.password1.label_tag }}
+          </div>
+          {{ form.password1.errors }}
+          {{ form.password1 }}
+        </div>
+
+        <!-- Password 2 -->
+        <div class="mb-3">
+          <div class="field-label">
+            {{ form.password2.label_tag }}
+          </div>
+          {{ form.password2.errors }}
+          {{ form.password2 }}
+        </div>
+
+        <!-- Display Name -->
+        <div class="mb-3">
+          <div class="field-label">
+            {{ form.display_name.label_tag }}
+          </div>
+          {{ form.display_name.errors }}
+          {{ form.display_name }}
+        </div>
+
+        <!-- Bio -->
+        <div class="mb-3">
+          <div class="field-label">
+            {{ form.bio.label_tag }}
+          </div>
+          {{ form.bio.errors }}
+          {{ form.bio }}
+        </div>
+
+        <!-- Interests (checkboxes) -->
+        <div class="mb-3">
+          <div class="field-label">
+            {{ form.interests.label }}
+          </div>
+          {{ form.interests.errors }}
+          <div class="interests-wrapper">
+            {{ form.interests }}
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-custom">Create Account</button>
+      </form>
+
+      <div class="back-link">
+        <a href="/">Back to login</a>
+      </div>
+    </div>
+  </div>
+
+</body>
 </html>
