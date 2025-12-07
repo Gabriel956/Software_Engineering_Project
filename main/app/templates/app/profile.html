@@ -99,7 +99,6 @@
     }
 
     .events-section {
-      
       padding: 40px 60px;
     }
 
@@ -137,13 +136,11 @@
 
     .event-card {
       display: flex;
-      
       padding: 18px;
       margin-bottom: 28px;
       align-items: right;
       gap: 16px;
       break-inside: avoid;
-      
     }
 
     .profile-thumb {
@@ -164,12 +161,6 @@
       flex: 1;
     }
 
-    .event-title {
-      font-size: 20px;
-      font-weight: 600;
-      margin-bottom: 6px;
-    }
-
     .event-desc {
       font-size: 18px;
       margin-bottom: 10px;
@@ -178,61 +169,97 @@
       top: 70px;
       background: #dbdbdb;
       width: 500px;
-      height 700px;
+      /* small typo fix: add colon */
+      height: 700px;
       padding: 20px;
       margin-bottom: 50px;
     }
 
-    .event-date {
-      font-size: 13px;
-      color: #333;
+    .profile-line {
+      margin-bottom: 10px;
+    }
+
+    .profile-label {
+      font-weight: 600;
+    }
+
+    .interest-pill {
+      display: inline-block;
+      background: #cfcfcf;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      margin: 2px 4px 0 0;
     }
 
     @media(max-width:1000px) {
       .events-grid {
         column-count: 1;
       }
+      .event-desc {
+        left: 0;
+        width: auto;
+      }
     }
   </style>
 </head>
 
-
-
-
 <body>
-
 
   <div class="events-section" id="eventsSection">
     <div class="topbar">
       <div class="brand-box"></div>
-      <button class="avatar btn bun-custom" onclick="history.back()">G</button>
+      <!-- Avatar button still just "G" for now, can be made dynamic later -->
+      <button class="avatar btn btn-custom" onclick="history.back()">{{initial}}</button>
     </div>
 
-  <!--<div class="event-card">
-        <div class="event-thumb"></div>
-        <div class="event-meta">
-          <div class="event-title">Title</div>
-          <div class="event-desc">Description of Event</div>
-          <div class="event-date">Date/time</div>
-        </div>
-   </div>-->
-    
     <div class="event-card">
-      <div class="profile-thumb">G</div>
+      <div class="profile-thumb">
+        <!-- You can keep this as G or later pass an initial from the backend -->
+        {{initial}}
+      </div>
 
       <div class="event-meta">
-        <div class="event-desc">Profile Info</div>
-        <div class="event-desc">Profile Info</div>
-        <div class="event-desc">Profile Info</div>
+        <div class="event-desc">
+          <div class="profile-line">
+            <span class="profile-label">Username:</span>
+            {{ profile.user.username }}
+          </div>
 
+          <div class="profile-line">
+            <span class="profile-label">Display Name:</span>
+            {{ profile.display_name|default:"Not set yet" }}
+          </div>
+
+          <div class="profile-line">
+            <span class="profile-label">Bio:</span><br>
+            {% if profile.bio %}
+              {{ profile.bio|linebreaksbr }}
+            {% else %}
+              <span class="text-muted">No bio yet.</span>
+            {% endif %}
+          </div>
+
+          <div class="profile-line">
+            <span class="profile-label">Interests:</span><br>
+            {% if profile.interests.all %}
+              {% for interest in profile.interests.all %}
+                <span class="interest-pill">{{ interest.name }}</span>
+              {% empty %}
+                <span class="text-muted">No interests selected yet.</span>
+              {% endfor %}
+            {% else %}
+              <span class="text-muted">No interests selected yet.</span>
+            {% endif %}
+          </div>
+          <div class="profile-line" style="margin-top: 20px;">
+            <a href="{% url 'edit_profile' %}" class="btn btn-custom">Edit Profile</a>
+          </div>
+
+
+        </div>
       </div>
     </div>
-
-
-
-
-<!--background: #e2e2e2;-->
-    
 
   </div>
 

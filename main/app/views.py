@@ -147,7 +147,41 @@ def event_list(request):
 @login_required
 def profile_view(request):
     profile = request.user.profile
+    if profile.display_name:
+        initial = profile.display_name[0].upper()
+    else:
+        username = request.user.username or 'U'
+        initial = username[0].upper()
+
     return render(request, "app/profile.html", {"profile": profile})
+
+class ProfileEditForm(ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['display_name', 'bio', 'interests']
+        widgets = {
+            'bio': forms.Textarea(attrs={'rows': 4}),
+            'interests': forms.CheckboxSelectMultiple(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['interests'].queryset = Interest.objects.all()
+
+
+@login_required
+def edit_profile(request):
+    profile = request.user.profile
+
+    if request.method == "POST":
+        form = ProfileEditForm(request.POST, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect("profile")
+    else:
+        form = ProfileEditForm(instance=profile)
+
+    return render(request, "app/edit_profile.html", {"form": form})
 
 @login_required
 def rsvp_event(request, event_id):
