@@ -179,9 +179,22 @@
     }
   </style>
 
-    
+
 </head>
 <body>
+  <div class="topbar">
+  <div class="brand-box"></div>
+
+  <div style="display:flex; gap:12px; align-items:center;">
+    <a href="{% url 'profile' %}">
+      <button class="avatar btn">{{ request.user.username|first|upper }}</button>
+    </a>
+    <a href="{% url 'logout' %}">
+      <button class="btn btn-dark">Sign Out</button>
+    </a>
+  </div>
+</div>
+
 
 <div class="events-section" id="eventsSection">
     <div class="topbar">
