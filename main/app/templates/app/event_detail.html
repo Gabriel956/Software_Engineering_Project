@@ -178,6 +178,82 @@
 
   <!-- RSVP + Attendees -->
   <div class="row">
+      <!-- Comments -->
+  <div class="row mt-4">
+    <div class="col-lg-8">
+      <div class="card-glass">
+        <h4 class="fw-bold mb-3">Comments</h4>
+
+        <!-- Comment form -->
+        <form method="post" class="mb-3">
+          {% csrf_token %}
+          {{ comment_form.non_field_errors }}
+
+          <div class="mb-2">
+            {{ comment_form.text.errors }}
+            {{ comment_form.text }}
+          </div>
+
+          <button
+            type="submit"
+            name="comment_submit"
+            class="btn btn-primary btn-sm">
+            Post Comment
+          </button>
+        </form>
+
+        <hr class="border-secondary">
+
+        <!-- Comment list -->
+        {% if comments %}
+          <ul class="list-unstyled mb-0">
+            {% for comment in comments %}
+              <li class="mb-3">
+                <div class="d-flex align-items-start gap-2">
+                  <div
+                    style="
+                      width: 32px;
+                      height: 32px;
+                      border-radius: 999px;
+                      background: linear-gradient(135deg,#3b82f6,#06b6d4);
+                      display:flex;
+                      align-items:center;
+                      justify-content:center;
+                      font-size: 0.85rem;
+                      font-weight: 700;
+                    ">
+                    {% if comment.author.display_name %}
+                      {{ comment.author.display_name|first|upper }}
+                    {% else %}
+                      {{ comment.author.user.username|first|upper }}
+                    {% endif %}
+                  </div>
+
+                  <div>
+                    <div class="small fw-semibold">
+                      {{ comment.author.display_name|default:comment.author.user.username }}
+                      <span class="text-secondary small ms-1">
+                        · {{ comment.created_at|date:"M d, Y" }}
+                        at {{ comment.created_at|time:"g:i A" }}
+                      </span>
+                    </div>
+                    <div class="small">
+                      {{ comment.text|linebreaksbr }}
+                    </div>
+                  </div>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="mb-0 text-secondary small">
+            No comments yet. Be the first to say something!
+          </p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
     <div class="col-md-6">
       <div class="card-glass">
         <h4 class="fw-bold mb-3">Your RSVP</h4>

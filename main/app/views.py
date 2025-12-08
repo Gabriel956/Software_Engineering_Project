@@ -132,20 +132,38 @@ def event_detail(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     profile = request.user.profile
 
+    # Avatar initial
     if profile.display_name:
         initial = profile.display_name[0].upper()
     else:
-        username = request.user.username or 'U'
-        initial = username[0].upper()
+        username = request.user.username or ""
+        initial = (username[0] if username else "U").upper()
 
-    #gets users rsvp status for the event
-    my_rsvp = RSVP.objects.filter(user=request.user.profile, event=event).first()
-    attendees = RSVP.objects.filter(event=event, status='attending')
-    #attendees list
-    attendees = event.rsvps.select_related('user')
+    my_rsvp = RSVP.objects.filter(user=profile, event=event).first()
+    attendees = RSVP.objects.filter(event=event)
 
-    return render(request,"app/event_detail.html",{"event": event,"my_rsvp": my_rsvp,"attendees": attendees,"initial": initial},)
+    # Handle new comment
+    if request.method == "POST" and "comment_submit" in request.POST:
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            comment = comment_form.save(commit=False)
+            comment.event = event
+            comment.author = profile
+            comment.save()
+            return redirect("event_detail", event_id=event.id)
+    else:
+        comment_form = CommentForm()
 
+    comments = event.comments.select_related("author", "author__user")
+
+    return render(request, "app/event_detail.html", {
+        "event": event,
+        "my_rsvp": my_rsvp,
+        "attendees": attendees,
+        "initial": initial,
+        "comment_form": comment_form,
+        "comments": comments,
+    })
 @login_required
 def event_list(request):
     profile = request.user.profile
@@ -195,6 +213,14 @@ class ProfileEditForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['interests'].queryset = Interest.objects.all()
+
+class CommentForm(ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['text']
+        widgets = {
+            'text': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Write a comment...'}),}
+        labels = {'text': 'Add a comment',}
 
 
 @login_required

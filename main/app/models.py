@@ -84,8 +84,8 @@ class RSVP(models.Model):
 
 class Comment(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='comments')
-    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    body = models.TextField()
+    author = models.ForeignKey('Profile', on_delete=models.CASCADE, related_name='comments', null=True, blank=True)
+    text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

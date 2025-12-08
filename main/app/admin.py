@@ -24,5 +24,11 @@ class RSVPAdmin(admin.ModelAdmin):
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ('user', 'event', 'created_at')
-    search_fields = ('user__username', 'event__title', 'body')
+    list_display = ('author', 'event', 'created_at')
+    list_filter = ('event', 'author')
+    search_fields = (
+        'author__display_name',
+        'author__user__username',
+        'event__title',
+        'text',
+    )
