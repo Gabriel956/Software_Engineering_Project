@@ -278,6 +278,12 @@ def edit_comment(request, comment_id):
     profile = request.user.profile
     comment = get_object_or_404(Comment, id=comment_id, author=profile)
 
+    if profile.display_name:
+        initial = profile.display_name[0].upper()
+    else:
+        username = request.user.username or 'U'
+        initial = username[0].upper()
+
     if request.method == "POST":
         form = CommentForm(request.POST, instance=comment)
         if form.is_valid():
@@ -290,6 +296,7 @@ def edit_comment(request, comment_id):
     return render(request, "app/edit_comment.html", {
         "form": form,
         "comment": comment,
+        "initial": initial,
     })
 
 
