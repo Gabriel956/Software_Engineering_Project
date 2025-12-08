@@ -1,238 +1,144 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
+  <title>Events</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>In the Works — Event</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
   <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-    }
-
     body {
-      background: #fff;
-      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      color: #111;
-      overflow-x: hidden;
-    }
-
-    .login-wrap {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0f172a, #020617);
+      color: #fff;
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      transition: opacity 0.5s ease;
     }
-
-    .login-card {
-      width: 360px;
-      background: transparent;
-      text-align: center;
+    .navbar {
+      background: rgba(15, 23, 42, 0.95);
+      box-shadow: 0 10px 30px rgba(0,0,0,.4);
     }
-
-    h1.title {
-      font-size: 22px;
-      font-weight: 800;
-      margin-bottom: 26px;
-      position: relative;
-      display: inline-block;
-      padding-bottom: 12px;
-    }
-
-    h1.title::after {
-      content: '';
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: 0;
-      height: 4px;
-      width: 36px;
-      background: #111;
-      border-radius: 2px;
-    }
-
-    .form-control.custom-input {
-      background: #dcdcdc;
-      border: 0;
-      height: 60px;
-      border-radius: 2px;
-      box-shadow: none;
-      padding-left: 18px;
-      padding-right: 18px;
-    }
-
-    .form-control.custom-input::placeholder {
-      color: #7b7b7b;
-    }
-
-    .create-link {
-      display: block;
-      text-align: left;
-      margin-top: 8px;
-      margin-bottom: 18px;
-      font-size: 12px;
-      color: #0d6efd;
-      text-decoration: none;
-    }
-
-    .btn-custom {
-      background: #1e1e1e;
-      color: #fff;
-      border: 0;
-      border-radius: 8px;
-      padding: 10px 26px;
-      box-shadow: 0 3px 0 rgba(0, 0, 0, 0.25);
-      font-size: 14px;
-      min-width: 90px;
-    }
-
-    .btn-row {
-      display: flex;
-      gap: 18px;
-      justify-content: center;
-      margin-top: 12px;
-    }
-
-    .events-section {
-      
-      padding: 40px 60px;
-    }
-
-    .topbar {
-      height: 80px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 28px;
-    }
-
-    .brand-box {
-      width: 360px;
-      height: 60px;
-      background: #dbdbdb;
-    }
-
-    .avatar {
-      width: 40px;
-      height: 40px;
+    .profile-circle {
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
-      background: #111;
-      color: #fff;
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 700;
     }
-
-    .events-grid {
-      column-count: 2;
-      column-gap: 70px;
-      margin-top: 20px;
-    }
-
     .event-card {
-      display: flex;
-      
-      padding: 18px;
-      margin-bottom: 28px;
-      align-items: right;
-      gap: 16px;
-      break-inside: avoid;
-      
+      background: rgba(255,255,255,0.05);
+      border-radius: 1.75rem;
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 30px 60px rgba(0,0,0,.4);
+      backdrop-filter: blur(14px);
+      overflow: hidden;
     }
-
-    .profile-thumb {
-      width: 200px;
-      height: 200px;
-      background: #111;
-      margin-top: 50px;
-      margin-left: 50px;
-      
+    .event-image {
+      height: 100%;
+      min-height: 260px;
+      background: linear-gradient(135deg, #111827, #1f2933);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
-      font-size: 48px;
-    }
-
-    .event-meta {
-      flex: 1;
-    }
-
-    .event-title {
-      font-size: 20px;
+      font-size: 2rem;
       font-weight: 600;
-      margin-bottom: 6px;
+      color: rgba(255,255,255,.4);
     }
-
-    .event-desc {
-      font-size: 18px;
-      margin-bottom: 10px;
-      position: relative;
-      left: 160px;
-      top: 70px;
-      background: #dbdbdb;
-      width: 500px;
-      height 700px;
-      padding: 20px;
-      margin-bottom: 50px;
-      display: flex;
+    .event-info {
+      padding: 2.5rem;
     }
-
-    .event-date {
-      font-size: 13px;
-      color: #333;
+    .badge-category {
+      background: linear-gradient(135deg, #6366f1, #22d3ee);
+      border-radius: 999px;
+      padding: 0.4rem 1rem;
+      font-weight: 600;
+      font-size: .85rem;
     }
-
-    @media(max-width:1000px) {
-      .events-grid {
-        column-count: 1;
-      }
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      border: none;
+      border-radius: .75rem;
+      padding: .65rem 1.2rem;
+      font-weight: 600;
+    }
+    .btn-outline-light {
+      border-radius: .75rem;
+    }
+    .event-meta span {
+      display: block;
+      font-size: .9rem;
+      opacity: .85;
     }
   </style>
 </head>
 
-
-
-
 <body>
 
+<nav class="navbar navbar-expand-lg navbar-dark px-4 py-3">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold fs-4" href="#">InTheWorks</a>
+    <div class="ms-auto">
+      <div class="profile-circle">G</div>
+    </div>
+  </div>
+</nav>
 
-  <div class="events-section" id="eventsSection">
-    <div class="topbar">
-      <div class="brand-box"></div>
+<div class="container py-5 mt-4">
+  <h1 class="fw-bold mb-4">Upcoming Event</h1>
 
-      <a href="{% url 'profile' %}" style="text-decoration: none;">
-      <button class="avatar btn bun-custom" >G</button>
-      </a>
+  <div class="event-card row g-0 align-items-stretch">
+    <div class="col-md-4">
+      <div class="event-image">Event Image</div>
     </div>
 
-  
-    
-    <div class="event-card">
-      <div class="profile-thumb">img</div>
+    <div class="col-md-8">
+      <div class="event-info">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div>
+            <h2 class="fw-bold mb-1">Campus Game Night</h2>
+            <span class="badge-category">Gaming</span>
+          </div>
+          <span class="fw-semibold text-info">Free</span>
+        </div>
 
-      <div class="event-meta">
-        <div class="event-title">{{ id.title }}</div>
-        <div class="event-desc">{{id.description}}</div>
-        
+        <p class="mb-4 opacity-75">
+          Join us for a fun night of board games, video games, and food with fellow students.
+          Meet new people, make friends, and unwind together.
+        </p>
 
+        <div class="row event-meta mb-4">
+          <div class="col-sm-4">
+            <span class="fw-semibold">Date</span>
+            <span>Oct 22, 2025</span>
+          </div>
+          <div class="col-sm-4">
+            <span class="fw-semibold">Time</span>
+            <span>6:00 PM</span>
+          </div>
+          <div class="col-sm-4">
+            <span class="fw-semibold">Location</span>
+            <span>Student Union Hall</span>
+          </div>
+        </div>
+
+        <div class="d-flex gap-3">
+          <button class="btn btn-outline-light">Save</button>
+          <button class="btn btn-primary">RSVP</button>
+        </div>
       </div>
     </div>
-
-
-
-
-        <!--background: #e2e2e2;-->
-    
-
   </div>
+</div>
 
+<script>
+  gsap.from(".navbar", { y: -80, opacity: 0, duration: 1 });
+  gsap.from("h1", { y: 40, opacity: 0, duration: 1, delay: .4 });
+  gsap.from(".event-card", { scale: .9, opacity: 0, duration: 1, delay: .8, ease: "power3.out" });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
