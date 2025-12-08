@@ -177,28 +177,66 @@ def event_detail(request, event_id):
         "comment_form": comment_form,
         "comments": comments,
     })
+
 @login_required
 def event_list(request):
     profile = request.user.profile
 
-    # Avatar initial like on profile page
+    # Avatar initial
     if profile.display_name:
         initial = profile.display_name[0].upper()
     else:
-        username = request.user.username or "U"
-        initial = username[0].upper()
+        username = request.user.username or ""
+        initial = (username[0] if username else "U").upper()
 
-    # Get all events (you can filter/sort later)
-    events = Event.objects.all().order_by("starts_at")
+    sort = request.GET.get("sort", "upcoming")  # default: upcoming
+
+    # IMPORTANT: matches name="interests" in the template
+    selected_interest_ids = request.GET.getlist("interests")
+
+    today = timezone.localdate()
+
+    # Base queryset: upcoming events (today or later)
+    qs = Event.objects.filter(starts_at__date__gte=today)
+
+    # Initial load (no query params at all): use profile interests
+    if not request.GET:
+        profile_interest_ids = [
+            str(pk) for pk in profile.interests.values_list("id", flat=True)
+        ]
+        if profile_interest_ids:
+            selected_interest_ids = profile_interest_ids
+
+    # If we have any selected interests (from profile OR user clicks),
+    # filter events by ANY of those interests
+    if selected_interest_ids:
+        qs = qs.filter(interests__id__in=selected_interest_ids).distinct()
+
+    # Sorting
+    if sort == "latest":
+        events = qs.order_by("-starts_at")
+    elif sort == "title":
+        events = qs.order_by("title")
+    else:  # "upcoming" or anything else
+        events = qs.order_by("starts_at")
+
+    interests = Interest.objects.all().order_by("name")
 
     rsvps = RSVP.objects.filter(user=profile)
     rsvp_map = {r.event_id: r.status for r in rsvps}
 
-    return render(request, "app/event_list.html", {
-        "events": events,
-        "initial": initial,
-        "rsvp_map": rsvp_map,
-    })
+    return render(
+        request,
+        "app/event_list.html",
+        {
+            "events": events,
+            "rsvp_map": rsvp_map,
+            "initial": initial,
+            "current_sort": sort,
+            "interests": interests,
+            "selected_interest_ids": selected_interest_ids,
+        },
+    )
 
 
 @login_required

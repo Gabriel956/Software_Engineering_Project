@@ -9,6 +9,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+
   <style>
     body {
       font-family: 'Poppins', sans-serif;
@@ -75,6 +76,51 @@
       font-size: .9rem;
       opacity: .85;
     }
+
+    .form-select.bg-dark {
+      background-color: rgba(15,23,42,0.95) !important;
+      color: #e5e7eb !important;
+      border: 1px solid rgba(148,163,184,0.6) !important;
+    }
+
+    /* Interest filter chips */
+    .filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+    }
+
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+      border-radius: 999px;
+      background: rgba(15,23,42,.9);
+      border: 1px solid rgba(148,163,184,.7);
+      padding: 0.25rem 0.75rem;
+      font-size: 12px;
+      color: #e5e7eb;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+      white-space: nowrap;
+    }
+
+    .filter-chip input[type="checkbox"] {
+      display: none;
+    }
+
+    .filter-chip.active {
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      border-color: #38bdf8;
+      color: #0b1220;
+      transform: translateY(-1px);
+    }
+
+    .filter-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      opacity: 0.75;
+    }
   </style>
 </head>
 
@@ -96,16 +142,78 @@
   </div>
 </nav>
 
-
 <div class="container py-5 mt-4">
-  <h1 class="fw-bold mb-4">Upcoming Events</h1>
-  <div class="mb-4">
-    <a href="{% url 'event_create' %}" class="btn btn-primary btn-lg px-4">
-      + Create Event
-    </a>
+
+  <h1 class="fw-bold mb-3">Upcoming Events</h1>
+
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+
+    <!-- Left: Create button -->
+    <div>
+      <a href="{% url 'event_create' %}" class="btn btn-primary btn-lg px-4">
+        + Create Event
+      </a>
+    </div>
+
+    <!-- Right: Sort + interest chips -->
+    <form method="get" class="d-flex flex-column align-items-md-end gap-2">
+
+      <!-- Sort row -->
+      <div class="d-flex align-items-center gap-2">
+        <span class="filter-label">Sort by</span>
+        <select
+          id="sort"
+          name="sort"
+          class="form-select form-select-sm bg-dark text-light border-secondary"
+          onchange="this.form.submit()"
+        >
+          <option value="upcoming"
+            {% if current_sort == 'upcoming' or not current_sort %}selected{% endif %}>
+            Date · Soonest first
+          </option>
+          <option value="latest"
+            {% if current_sort == 'latest' %}selected{% endif %}>
+            Date · Furthest first
+          </option>
+          <option value="title"
+            {% if current_sort == 'title' %}selected{% endif %}>
+            Title · A–Z
+          </option>
+        </select>
+      </div>
+
+      <!-- Interest chips row -->
+      <div class="d-flex flex-column align-items-md-end gap-1">
+        <span class="filter-label">Filter by interests</span>
+        <div class="filter-chips">
+          {% for interest in interests %}
+            {% with interest_id_str=interest.id|stringformat:"s" %}
+              <label class="filter-chip
+                            {% if interest_id_str in selected_interest_ids %}active{% endif %}">
+                <input
+                  type="checkbox"
+                  name="interests"
+                  value="{{ interest.id }}"
+                  {% if interest_id_str in selected_interest_ids %}checked{% endif %}
+                >
+                <span>{{ interest.name }}</span>
+              </label>
+            {% endwith %}
+          {% endfor %}
+        </div>
+      </div>
+      <!-- Clear Filters -->
+      <a href="{% url 'event_list' %}?sort={{ current_sort }}" 
+        class="text-decoration-none small mt-1"
+        style="opacity: 0.75;">
+            Clear filters
+      </a>
+
+    </form>
   </div>
 
   {% if events %}
+
     {% for event in events %}
       <div class="event-card row g-0 align-items-stretch">
         <div class="col-md-4">
@@ -137,7 +245,7 @@
                 {% endwith %}
               </div>
 
-              <!-- Example price / capacity info; customize as needed -->
+              <!-- Example capacity info; customize as needed -->
               <span class="fw-semibold text-info">
                 {{ event.capacity|default:"" }}
               </span>
@@ -162,52 +270,61 @@
               </div>
             </div>
 
-<div class="d-flex gap-3 align-items-center">
+            <div class="d-flex gap-3 align-items-center">
 
-  <!-- GOING -->
-  <form method="post" action="{% url 'rsvp_event' event.id %}">
-    {% csrf_token %}
-    <input type="hidden" name="status" value="going">
-    <button 
-      type="submit"
-      class="btn btn-sm {% if rsvp_map|get_item:event.id == 'going' %}btn-primary{% else %}btn-outline-light{% endif %}">
-      Going
-    </button>
-  </form>
+              <!-- GOING -->
+              <form method="post" action="{% url 'rsvp_event' event.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="status" value="going">
+                <button 
+                  type="submit"
+                  class="btn btn-sm {% if rsvp_map|get_item:event.id == 'going' %}btn-primary{% else %}btn-outline-light{% endif %}">
+                  Going
+                </button>
+              </form>
 
-  <!-- MAYBE -->
-  <form method="post" action="{% url 'rsvp_event' event.id %}">
-    {% csrf_token %}
-    <input type="hidden" name="status" value="maybe">
-    <button 
-      type="submit"
-      class="btn btn-sm {% if rsvp_map|get_item:event.id == 'maybe' %}btn-primary{% else %}btn-outline-light{% endif %}">
-      Maybe
-    </button>
-  </form>
+              <!-- MAYBE -->
+              <form method="post" action="{% url 'rsvp_event' event.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="status" value="maybe">
+                <button 
+                  type="submit"
+                  class="btn btn-sm {% if rsvp_map|get_item:event.id == 'maybe' %}btn-primary{% else %}btn-outline-light{% endif %}">
+                  Maybe
+                </button>
+              </form>
 
-  <!-- NOT GOING -->
-  <form method="post" action="{% url 'rsvp_event' event.id %}">
-    {% csrf_token %}
-    <input type="hidden" name="status" value="no">
-    <button 
-      type="submit"
-      class="btn btn-sm {% if rsvp_map|get_item:event.id == 'no' %}btn-primary{% else %}btn-outline-light{% endif %}">
-      Not Going
-    </button>
-  </form>
+              <!-- NOT GOING -->
+              <form method="post" action="{% url 'rsvp_event' event.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="status" value="no">
+                <button 
+                  type="submit"
+                  class="btn btn-sm {% if rsvp_map|get_item:event.id == 'no' %}btn-primary{% else %}btn-outline-light{% endif %}">
+                  Not Going
+                </button>
+              </form>
 
-</div>
+            </div>
 
           </div>
         </div>
       </div>
     {% endfor %}
+
   {% else %}
-    <p>No events yet. Check back soon!</p>
+    <div class="text-center py-5">
+      <h5 class="fw-semibold mb-2">No events match your filters.</h5>
+      <p class="opacity-75 mb-3">
+        Try adjusting your interests or create a new event to get things started.
+      </p>
+      <a href="{% url 'event_create' %}" class="btn btn-primary">
+        + Create Event
+      </a>
+    </div>
   {% endif %}
 
-</div>
+</div>  <!-- /.container -->
 
 <script>
   gsap.from(".navbar", { y: -80, opacity: 0, duration: 1 });
@@ -216,5 +333,34 @@
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.querySelector("form[method='get']");
+    if (!form) return;
+
+    // Handle filter chips
+    document.querySelectorAll(".filter-chip input[type='checkbox']").forEach(function (input) {
+      const chip = input.closest(".filter-chip");
+
+      const updateState = () => {
+        if (input.checked) {
+          chip.classList.add("active");
+        } else {
+          chip.classList.remove("active");
+        }
+      };
+
+      // Initial state (for back/forward or preselected filters)
+      updateState();
+
+      input.addEventListener("change", function () {
+        updateState();
+        form.submit();  // auto-submit whenever chips change
+      });
+    });
+  });
+</script>
+
 </body>
 </html>
