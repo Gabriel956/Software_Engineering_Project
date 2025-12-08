@@ -183,19 +183,38 @@
   <div class="login-wrap" id="loginWrap">
     <div class="login-card">
       <h1 class="title">Login</h1>
-      <form class="px-2" onsubmit="return false;">
-        <div class="mb-3">
-          <input type="text" class="form-control custom-input" placeholder="Username">
-        </div>
-        <div class="mb-1">
-          <input type="password" class="form-control custom-input" placeholder="Password">
-        </div>
-        <a href="#" class="create-link">Create Account</a>
-        <div class="btn-row">
-          <button class="btn btn-custom" id="signup">Sign Up</button>
-          <button class="btn btn-custom" id="login">Login</button>
-        </div>
-      </form>
+      <form class="px-2" method="post" action="{% url 'login_events' %}">
+  {% csrf_token %}
+
+  {% if error %}
+    <p style="color: #fca5a5; font-size: 0.9rem; text-align: left;">
+      {{ error }}
+    </p>
+  {% endif %}
+
+  <div class="mb-3">
+    <input type="text"
+           class="form-control custom-input"
+           name="username"
+           placeholder="Username"
+           required>
+  </div>
+  <div class="mb-1">
+    <input type="password"
+           class="form-control custom-input"
+           name="password"
+           placeholder="Password"
+           required>
+  </div>
+
+  <a href="{% url 'signup' %}" class="create-link">Create Account</a>
+
+  <div class="btn-row">
+    <a href="{% url 'signup' %}" class="btn btn-custom" id="signup">Sign Up</a>
+    <button type="submit" class="btn btn-custom" id="login">Login</button>
+  </div>
+</form>
+
     </div>
   </div>
 
@@ -241,17 +260,6 @@
     gsap.from('.create-link', { opacity: 0, y: 10, delay: 0.4 });
     gsap.from('.btn-row button', { opacity: 0, y: 15, stagger: 0.1, delay: 0.5 });
 
-    document.getElementById('login').addEventListener('click', () => {
-      gsap.to('#loginWrap', {
-        opacity: 0, duration: 0.5, onComplete: () => {
-          document.getElementById('loginWrap').style.display = 'none';
-          document.getElementById('eventsSection').style.display = 'block';
-          gsap.from('.event-card', { opacity: 0, y: 20, stagger: 0.1, duration: 0.6 });
-          gsap.from('.brand-box', { x: -20, opacity: 0, duration: 0.6 });
-          gsap.from('.avatar', { x: 20, opacity: 0, duration: 0.6 });
-        }
-      });
-    });
   </script>
 
 </body>

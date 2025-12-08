@@ -130,19 +130,45 @@ def event_create(request):
 @login_required
 def event_detail(request, event_id):
     event = get_object_or_404(Event, id=event_id)
+    profile = request.user.profile
+
+    if profile.display_name:
+        initial = profile.display_name[0].upper()
+    else:
+        username = request.user.username or 'U'
+        initial = username[0].upper()
 
     #gets users rsvp status for the event
     my_rsvp = RSVP.objects.filter(user=request.user.profile, event=event).first()
-
+    attendees = RSVP.objects.filter(event=event, status='attending')
     #attendees list
     attendees = event.rsvps.select_related('user')
 
-    return render(request,"app/event_detail.html",{"event": event,"my_rsvp": my_rsvp,"attendees": attendees,},)
+    return render(request,"app/event_detail.html",{"event": event,"my_rsvp": my_rsvp,"attendees": attendees,"initial": initial},)
 
 @login_required
 def event_list(request):
-    events = Event.objects.order_by('starts_at')
-    return render(request, "app/event_list.html", {"events": events})
+    profile = request.user.profile
+
+    # Avatar initial like on profile page
+    if profile.display_name:
+        initial = profile.display_name[0].upper()
+    else:
+        username = request.user.username or "U"
+        initial = username[0].upper()
+
+    # Get all events (you can filter/sort later)
+    events = Event.objects.all().order_by("starts_at")
+
+    rsvps = RSVP.objects.filter(user=profile)
+    rsvp_map = {r.event_id: r.status for r in rsvps}
+
+    return render(request, "app/event_list.html", {
+        "events": events,
+        "initial": initial,
+        "rsvp_map": rsvp_map,
+    })
+
 
 @login_required
 def profile_view(request):
@@ -153,7 +179,9 @@ def profile_view(request):
         username = request.user.username or 'U'
         initial = username[0].upper()
 
-    return render(request, "app/profile.html", {"profile": profile})
+    attending_rsvps = (RSVP.objects.filter(user=profile, status='going').select_related('event').order_by('event__starts_at'))
+
+    return render(request, "app/profile.html", {"profile": profile, "initial": initial, "attending_rsvps": attending_rsvps})
 
 class ProfileEditForm(ModelForm):
     class Meta:
@@ -172,6 +200,12 @@ class ProfileEditForm(ModelForm):
 @login_required
 def edit_profile(request):
     profile = request.user.profile
+    if profile.display_name:
+        initial = profile.display_name[0].upper()
+    else:
+        username = request.user.username or 'U'
+        initial = username[0].upper()
+
 
     if request.method == "POST":
         form = ProfileEditForm(request.POST, instance=profile)
@@ -181,7 +215,7 @@ def edit_profile(request):
     else:
         form = ProfileEditForm(instance=profile)
 
-    return render(request, "app/edit_profile.html", {"form": form})
+    return render(request, "app/edit_profile.html", {"form": form, "initial": initial})
 
 @login_required
 def rsvp_event(request, event_id):
