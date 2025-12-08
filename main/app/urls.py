@@ -11,4 +11,6 @@ urlpatterns = [
     path('profile/edit/', views.edit_profile, name='edit_profile'),
     path('events/<int:event_id>/rsvp/', views.rsvp_event, name='rsvp_event'),
     path('logout/', views.logout_view, name='logout'),
+    path('comments/<int:comment_id>/delete/', views.delete_comment, name='delete_comment'),
+    path('comments/<int:comment_id>/edit/', views.edit_comment, name='edit_comment'),
 ]

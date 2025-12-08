@@ -222,6 +222,42 @@ class CommentForm(ModelForm):
             'text': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Write a comment...'}),}
         labels = {'text': 'Add a comment',}
 
+@login_required
+def edit_comment(request, comment_id):
+    profile = request.user.profile
+    comment = get_object_or_404(Comment, id=comment_id, author=profile)
+
+    if request.method == "POST":
+        form = CommentForm(request.POST, instance=comment)
+        if form.is_valid():
+            form.save()
+            return redirect("event_detail", event_id=comment.event.id)
+    else:
+        form = CommentForm(instance=comment)
+
+    # Small, focused edit page
+    return render(request, "app/edit_comment.html", {
+        "form": form,
+        "comment": comment,
+    })
+
+
+@login_required
+def delete_comment(request, comment_id):
+    profile = request.user.profile
+    comment = get_object_or_404(Comment, id=comment_id, author=profile)
+
+    event_id = comment.event.id
+
+    if request.method == "POST":
+        comment.delete()
+        return redirect("event_detail", event_id=event_id)
+
+    # Optional: simple confirm page
+    return render(request, "app/confirm_delete_comment.html", {
+        "comment": comment,
+    })
+
 
 @login_required
 def edit_profile(request):
