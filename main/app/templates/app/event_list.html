@@ -99,6 +99,11 @@
 
 <div class="container py-5 mt-4">
   <h1 class="fw-bold mb-4">Upcoming Events</h1>
+  <div class="mb-4">
+    <a href="{% url 'event_create' %}" class="btn btn-primary btn-lg px-4">
+      + Create Event
+    </a>
+  </div>
 
   {% if events %}
     {% for event in events %}

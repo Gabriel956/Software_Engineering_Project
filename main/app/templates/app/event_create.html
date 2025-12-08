@@ -62,6 +62,7 @@
     .btn-outline-light {
       border-radius: .75rem;
     }
+    /* Form controls */
     form label {
       font-weight: 500;
       font-size: 0.95rem;
@@ -76,7 +77,6 @@
       color: #e5e7eb;
       padding: 0.6rem 0.9rem;
       font-size: 0.95rem;
-      width: 100%;
     }
     form input:focus,
     form select:focus,
@@ -92,47 +92,6 @@
     .text-danger {
       font-size: 0.8rem;
     }
-
-        .interests-wrapper {
-      max-height: 180px;
-      overflow-y: auto;
-      padding: 0.6rem 0.8rem;
-      background: rgba(15,23,42,.85);
-      border-radius: .75rem;
-      border: 1px solid rgba(148,163,184,.6);
-      font-size: 13px;
-    }
-
-    .interest-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-    }
-
-    .interest-chip {
-      display: inline-flex;
-      align-items: center;
-      cursor: pointer;
-      border-radius: 999px;
-      background: rgba(15,23,42,.85);
-      border: 1px solid rgba(148,163,184,.7);
-      padding: 0.25rem 0.75rem;
-      font-size: 12px;
-      color: #e5e7eb;
-      transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
-    }
-
-    .interest-chip input[type="checkbox"] {
-      display: none;
-    }
-
-    .interest-chip.active {
-      background: linear-gradient(135deg, #3b82f6, #06b6d4);
-      border-color: #38bdf8;
-      color: #0b1220;
-      transform: translateY(-1px);
-    }
-
   </style>
 </head>
 
@@ -178,56 +137,24 @@
             </div>
           {% endif %}
 
-{% for field in form %}
-  {% if field.name == "interests" %}
-    <div class="mb-3">
-      <label>{{ field.label }}</label>
-      <div class="interests-wrapper">
-        <div class="interest-chips">
-          {% for checkbox in field %}
-            <label class="interest-chip
-                          {% if checkbox.choice_value in field.value %}
-                            active
-                          {% endif %}">
-              {{ checkbox.tag }}
-              <span>{{ checkbox.choice_label }}</span>
-            </label>
+          {% for field in form %}
+            <div class="mb-3">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+
+              {% if field.help_text %}
+                <div class="form-text">
+                  {{ field.help_text }}
+                </div>
+              {% endif %}
+
+              {% for error in field.errors %}
+                <div class="text-danger">
+                  {{ error }}
+                </div>
+              {% endfor %}
+            </div>
           {% endfor %}
-        </div>
-      </div>
-
-      {% if field.help_text %}
-        <div class="form-text">
-          {{ field.help_text }}
-        </div>
-      {% endif %}
-
-      {% for error in field.errors %}
-        <div class="text-danger">
-          {{ error }}
-        </div>
-      {% endfor %}
-    </div>
-  {% else %}
-    <div class="mb-3">
-      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-      {{ field }}
-
-      {% if field.help_text %}
-        <div class="form-text">
-          {{ field.help_text }}
-        </div>
-      {% endif %}
-
-      {% for error in field.errors %}
-        <div class="text-danger">
-          {{ error }}
-        </div>
-      {% endfor %}
-    </div>
-  {% endif %}
-{% endfor %}
-
 
           <div class="d-flex justify-content-between align-items-center mt-4">
             <a href="{% url 'event_list' %}" class="btn btn-outline-light">
@@ -245,24 +172,5 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll(".interest-chip input[type='checkbox']").forEach(function (input) {
-      const chip = input.closest(".interest-chip");
-      const updateState = () => {
-        if (input.checked) {
-          chip.classList.add("active");
-        } else {
-          chip.classList.remove("active");
-        }
-      };
-      // Initial state (for form re-renders with errors)
-      updateState();
-      // Toggle on change
-      input.addEventListener("change", updateState);
-    });
-  });
-</script>
-
 </body>
 </html>

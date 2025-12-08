@@ -111,21 +111,34 @@ class EventForm(ModelForm):
 def event_create(request):
     profile = request.user.profile
 
+    if profile.display_name:
+        initial = profile.display_name[0].upper()
+    else:
+        username = request.user.username or ""
+        initial = (username[0] if username else "U").upper()
+
     if request.method == "POST":
         form = EventForm(request.POST)
         if form.is_valid():
             event = form.save(commit=False)
             event.host = profile
-
             event.starts_at = form.cleaned_data['starts_at']
-            
             event.save()
             form.save_m2m()
-            return redirect("event_detail", event_id=event.id)   # <— Redirect is valid response!
+            return redirect("event_detail", event_id=event.id)
     else:
         form = EventForm()
 
-    return render(request, "app/event_form.html", {"form": form})
+    # 👇 add initial here (adjust attribute/method to match your Profile model)
+    return render(
+        request,
+        "app/event_form.html",
+        {
+            "form": form,
+            "initial": initial,
+        },
+    )
+
 
 @login_required
 def event_detail(request, event_id):
