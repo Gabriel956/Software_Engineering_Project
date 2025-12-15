@@ -40,6 +40,10 @@ class Event(models.Model):
         (PRIVATE, 'Private'),
     ]
 
+    image = models.ImageField(upload_to='event_images/', blank=True, null=True)
+
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='events_created')
+
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True)
 

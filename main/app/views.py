@@ -8,6 +8,7 @@ from django.utils import timezone
 from .models import Event, RSVP, Comment, Interest, Profile
 from django.forms import ModelForm
 from django import forms
+from django.http import HttpResponseForbidden
 
 def login_events(request):
     # If already logged in, go straight to events
@@ -88,6 +89,7 @@ def signup(request):
 class EventForm(ModelForm):
     class Meta:
         model = Event
+        exclude = ('owner', 'host')
         fields = [
             'title',
             'description',
@@ -96,6 +98,7 @@ class EventForm(ModelForm):
             'capacity',
             'visibility',
             'interests',
+            'image',
         ]
         widgets = {
             'starts_at': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
@@ -118,13 +121,16 @@ def event_create(request):
         initial = (username[0] if username else "U").upper()
 
     if request.method == "POST":
-        form = EventForm(request.POST)
+        form = EventForm(request.POST, request.FILES)
         if form.is_valid():
             event = form.save(commit=False)
+            # 🔐 ownership + existing logic
+            event.owner = request.user
             event.host = profile
-            event.starts_at = form.cleaned_data['starts_at']
+            event.starts_at = form.cleaned_data["starts_at"]
             event.save()
             form.save_m2m()
+
             return redirect("event_detail", event_id=event.id)
     else:
         form = EventForm()
@@ -138,6 +144,46 @@ def event_create(request):
             "initial": initial,
         },
     )
+
+
+@login_required
+def event_edit(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    profile = request.user.profile
+
+    # Avatar initial
+    if profile.display_name:
+        initial = profile.display_name[0].upper()
+    else:
+        username = request.user.username or ""
+        initial = (username[0] if username else "U").upper()
+
+    if event.owner != request.user:
+        return HttpResponseForbidden("You do not have permission to edit this event.")
+
+    profile = request.user.profile
+    initial = (profile.display_name[0].upper() if getattr(profile, "display_name", "") else (request.user.username[:1] or "U").upper())
+
+    if request.method == "POST":
+        form = EventForm(request.POST, request.FILES, instance=event)
+
+        if form.is_valid():
+            updated = form.save(commit=False)
+            updated.owner = request.user      # keep stable
+            updated.host = profile            # keep stable
+            updated.save()
+            form.save_m2m()
+            return redirect("event_detail", event_id=event.id)
+
+        # ✅ IMPORTANT: if invalid, fall through to render with this *bound* form
+    else:
+        form = EventForm(instance=event)
+
+    return render(request, "app/edit_event.html", {
+        "form": form,
+        "event": event,
+        "initial": initial,
+    })
 
 
 @login_required
