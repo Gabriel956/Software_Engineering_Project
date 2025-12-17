@@ -10,13 +10,14 @@ from django.forms import ModelForm
 from django import forms
 from django.http import HttpResponseForbidden
 
+# Login view showing events for logged-out users
 def login_events(request):
     # If already logged in, go straight to events
     if request.user.is_authenticated:
         return redirect("event_list")
 
     error = None
-
+    # Handle login form submission
     if request.method == "POST":
         username = request.POST.get("username", "").strip()
         password = request.POST.get("password", "")
@@ -32,8 +33,9 @@ def login_events(request):
     # Just show login form (no events here)
     return render(request, "app/login_events.html", {"error": error})
 
-
+# Signup view
 def signup(request):
+    # Handle signup form submission
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -45,7 +47,9 @@ def signup(request):
 
     return render(request, "app/signup.html", {"form": form})
 
+# Custom signup form extending UserCreationForm
 class SignUpForm(UserCreationForm):
+    # Extra fields for Profile
     display_name = forms.CharField(max_length = 20, required=False, label = 'Display Name')
     bio = forms.CharField(widget = forms.Textarea, required=False, label = 'Bio')
     interests = forms.ModelMultipleChoiceField(queryset=Interest.objects.all(), widget=forms.CheckboxSelectMultiple, required=False, label='Interests')
@@ -54,6 +58,7 @@ class SignUpForm(UserCreationForm):
         model = User
         fields = ('username', 'email', 'password1', 'password2', 'display_name', 'bio', 'interests')
 
+# Signup view using the custom form
 def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -82,11 +87,9 @@ def signup(request):
 
     return render(request, 'app/signup.html', {'form': form})
 
-
-
-
-
+# Event form for creating and editing events
 class EventForm(ModelForm):
+    # Form configuration for Event model
     class Meta:
         model = Event
         exclude = ('owner', 'host')
@@ -100,6 +103,7 @@ class EventForm(ModelForm):
             'interests',
             'image',
         ]
+        # Widget customizations
         widgets = {
             'starts_at': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'interests': forms.CheckboxSelectMultiple(), # multi-select dropdown
@@ -110,16 +114,18 @@ class EventForm(ModelForm):
         # Load all available interests for dropdown
         self.fields['interests'].queryset = Interest.objects.all()
 
+# Create new event
 @login_required
 def event_create(request):
     profile = request.user.profile
 
+    # Avatar initial
     if profile.display_name:
         initial = profile.display_name[0].upper()
     else:
         username = request.user.username or ""
         initial = (username[0] if username else "U").upper()
-
+    # Create event logic
     if request.method == "POST":
         form = EventForm(request.POST, request.FILES)
         if form.is_valid():
@@ -145,9 +151,10 @@ def event_create(request):
         },
     )
 
-
+# Edit existing event
 @login_required
 def event_edit(request, event_id):
+    # Get event and profile
     event = get_object_or_404(Event, id=event_id)
     profile = request.user.profile
 
@@ -178,16 +185,17 @@ def event_edit(request, event_id):
         # ✅ IMPORTANT: if invalid, fall through to render with this *bound* form
     else:
         form = EventForm(instance=event)
-
+    # Render edit form
     return render(request, "app/edit_event.html", {
         "form": form,
         "event": event,
         "initial": initial,
     })
 
-
+# View event details
 @login_required
 def event_detail(request, event_id):
+    # Get event and profile
     event = get_object_or_404(Event, id=event_id)
     profile = request.user.profile
 
@@ -197,7 +205,7 @@ def event_detail(request, event_id):
     else:
         username = request.user.username or ""
         initial = (username[0] if username else "U").upper()
-
+    # Get user's RSVP and attendees
     my_rsvp = RSVP.objects.filter(user=profile, event=event).first()
     attendees = RSVP.objects.filter(event=event)
 
@@ -212,9 +220,9 @@ def event_detail(request, event_id):
             return redirect("event_detail", event_id=event.id)
     else:
         comment_form = CommentForm()
-
+    # Load comments with related author and user data
     comments = event.comments.select_related("author", "author__user")
-
+    # Render event detail page
     return render(request, "app/event_detail.html", {
         "event": event,
         "my_rsvp": my_rsvp,
@@ -223,7 +231,7 @@ def event_detail(request, event_id):
         "comment_form": comment_form,
         "comments": comments,
     })
-
+#  List events with filtering and sorting
 @login_required
 def event_list(request):
     profile = request.user.profile
@@ -265,12 +273,12 @@ def event_list(request):
         events = qs.order_by("title")
     else:  # "upcoming" or anything else
         events = qs.order_by("starts_at")
-
+    # Load all interests for the filter sidebar
     interests = Interest.objects.all().order_by("name")
-
+    # Load user's RSVPs for these events
     rsvps = RSVP.objects.filter(user=profile)
     rsvp_map = {r.event_id: r.status for r in rsvps}
-
+    # Render event list page
     return render(
         request,
         "app/event_list.html",
@@ -284,21 +292,24 @@ def event_list(request):
         },
     )
 
-
+# View user profile
 @login_required
 def profile_view(request):
+    # Get user profile
     profile = request.user.profile
     if profile.display_name:
         initial = profile.display_name[0].upper()
     else:
         username = request.user.username or 'U'
         initial = username[0].upper()
-
+    # Get events the user is attending
     attending_rsvps = (RSVP.objects.filter(user=profile, status='going').select_related('event').order_by('event__starts_at'))
-
+    # Render profile page
     return render(request, "app/profile.html", {"profile": profile, "initial": initial, "attending_rsvps": attending_rsvps})
 
+# Form for editing user profile
 class ProfileEditForm(ModelForm):
+    # Form configuration for Profile model
     class Meta:
         model = Profile
         fields = ['display_name', 'bio', 'interests']
@@ -306,12 +317,14 @@ class ProfileEditForm(ModelForm):
             'bio': forms.Textarea(attrs={'rows': 4}),
             'interests': forms.CheckboxSelectMultiple(),
         }
-
+    # Load all available interests for the interests field
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['interests'].queryset = Interest.objects.all()
 
+# Form for adding/editing comments
 class CommentForm(ModelForm):
+    # Form configuration for Comment model
     class Meta:
         model = Comment
         fields = ['text']
@@ -319,17 +332,19 @@ class CommentForm(ModelForm):
             'text': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Write a comment...'}),}
         labels = {'text': 'Add a comment',}
 
+# Edit existing comment
 @login_required
 def edit_comment(request, comment_id):
+    # Get comment and profile
     profile = request.user.profile
     comment = get_object_or_404(Comment, id=comment_id, author=profile)
-
+    # Avatar initial
     if profile.display_name:
         initial = profile.display_name[0].upper()
     else:
         username = request.user.username or 'U'
         initial = username[0].upper()
-
+    # Handle comment edit form submission
     if request.method == "POST":
         form = CommentForm(request.POST, instance=comment)
         if form.is_valid():
@@ -345,14 +360,15 @@ def edit_comment(request, comment_id):
         "initial": initial,
     })
 
-
+# Delete existing comment
 @login_required
 def delete_comment(request, comment_id):
+    # Get comment and profile
     profile = request.user.profile
     comment = get_object_or_404(Comment, id=comment_id, author=profile)
-
+    # Get event ID
     event_id = comment.event.id
-
+    # Handle deletion confirmation
     if request.method == "POST":
         comment.delete()
         return redirect("event_detail", event_id=event_id)
@@ -362,9 +378,10 @@ def delete_comment(request, comment_id):
         "comment": comment,
     })
 
-
+# Edit user profile
 @login_required
 def edit_profile(request):
+    # Get user profile
     profile = request.user.profile
     if profile.display_name:
         initial = profile.display_name[0].upper()
@@ -372,7 +389,7 @@ def edit_profile(request):
         username = request.user.username or 'U'
         initial = username[0].upper()
 
-
+    # Handle profile edit form submission
     if request.method == "POST":
         form = ProfileEditForm(request.POST, instance=profile)
         if form.is_valid():
@@ -380,14 +397,16 @@ def edit_profile(request):
             return redirect("profile")
     else:
         form = ProfileEditForm(instance=profile)
-
+    # Render profile edit page
     return render(request, "app/edit_profile.html", {"form": form, "initial": initial})
 
+# RSVP to an event
 @login_required
 def rsvp_event(request, event_id):
+    # Get event and profile
     event = get_object_or_404(Event, id=event_id)
     profile = request.user.profile
-
+    # Handle RSVP form submission
     if request.method == "POST":
         status = request.POST.get("status")
 
@@ -398,7 +417,7 @@ def rsvp_event(request, event_id):
                 defaults={"status": status},
             )
     return redirect("event_detail", event_id=event.id)
-
+# Logout view
 def logout_view(request):
     logout(request)
     return redirect("login_events")

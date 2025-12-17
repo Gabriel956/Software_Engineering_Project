@@ -21,8 +21,9 @@ class Profile(models.Model):
     interests = models.ManyToManyField('Interest', blank=True)
 
     def __str__(self):
-        return self.display_name 
-    
+        return self.display_name
+
+# Interest model for user interests
 class Interest(models.Model):
     name = models.CharField(max_length=50, unique=True)
 
@@ -31,32 +32,34 @@ class Interest(models.Model):
 
     def __str__(self):
         return self.name
-    
+# Event model to store event details
 class Event(models.Model):
+    # Event visibility choices
     PUBLIC = 'public'
     PRIVATE = 'private'
     VISIBILITY_CHOICES = [
         (PUBLIC, 'Public'),
         (PRIVATE, 'Private'),
     ]
-
+    # Optional image for the event
     image = models.ImageField(upload_to='event_images/', blank=True, null=True)
-
+    # Event owner (creator)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='events_created')
-
+    # Event details
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True)
-
+    # Event host (Profile)
     host = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='hosted_events')
-
+    # Event location and time
     location = models.CharField(max_length=255)
     starts_at = models.DateTimeField()
-
+    # Optional end time
+    ends_at = models.DateTimeField(blank=True, null=True)
     capacity = models.PositiveIntegerField()
-
+    # Event visibility
     visibility = models.CharField(max_length=10, choices=VISIBILITY_CHOICES, default=PUBLIC)
     interests = models.ManyToManyField(Interest, blank=True, related_name='events')
-
+    # Timestamp
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -67,11 +70,11 @@ class Event(models.Model):
 
     def __str__(self):
         return self.title
-    
+# RSVP model to track user responses to events    
 class RSVP(models.Model):
     class Meta:
         constraints = [models.UniqueConstraint(fields=['user', 'event'], name='unique_rsvp')]
-        
+    # RSVP status choices
     GOING = 'going'
     MAYBE = 'maybe'
     NO = 'no'
@@ -85,7 +88,7 @@ class RSVP(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
 
-
+# Comment model for event comments
 class Comment(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey('Profile', on_delete=models.CASCADE, related_name='comments', null=True, blank=True)
