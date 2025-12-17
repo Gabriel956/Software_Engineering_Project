@@ -83,6 +83,7 @@ class RSVP(models.Model):
         (MAYBE, 'Maybe'),
         (NO, 'Not going')
     ]
+    # RSVP details
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='rsvps')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES)
@@ -90,6 +91,7 @@ class RSVP(models.Model):
 
 # Comment model for event comments
 class Comment(models.Model):
+    # Comment details
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey('Profile', on_delete=models.CASCADE, related_name='comments', null=True, blank=True)
     text = models.TextField()
