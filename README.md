@@ -57,3 +57,9 @@ Duration: Nov 2 - Nov 15
 Goals:
 Work on how site should look
 Finalize login?
+Sprint 3: 
+Duration: Nov 
+
+
+admin
+admin956
