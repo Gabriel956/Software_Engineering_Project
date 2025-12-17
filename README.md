@@ -5,9 +5,9 @@ admin956
 
 current build is frontend-1
 
+DJANGO/PILLOW INSTALL
 
-
-App name: in the works
+App name: VAQUEROS MEETS
 
 Description: 
 An online social network that helps people find and connect with others who have similar interests. Find or create events based on the user's hobbies, lifestyle, or passions, such as local hangouts, community activities, or group meetups.
