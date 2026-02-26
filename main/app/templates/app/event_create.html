@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create Event — InTheWorks</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0f172a, #020617);
+      color: #fff;
+      min-height: 100vh;
+    }
+    .navbar {
+      background: rgba(15, 23, 42, 0.95);
+      box-shadow: 0 10px 30px rgba(0,0,0,.4);
+    }
+    .profile-circle {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+    .page-wrapper {
+      padding-top: 4rem;
+      padding-bottom: 4rem;
+    }
+    .form-card {
+      background: rgba(255,255,255,0.06);
+      border-radius: 1.75rem;
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 30px 60px rgba(0,0,0,.45);
+      backdrop-filter: blur(16px);
+      padding: 2.5rem 2.25rem;
+    }
+    .form-title {
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .form-subtitle {
+      opacity: .8;
+      font-size: 0.95rem;
+      margin-bottom: 1.75rem;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      border: none;
+      border-radius: .9rem;
+      padding: .7rem 1.6rem;
+      font-weight: 600;
+    }
+    .btn-primary:hover {
+      filter: brightness(1.1);
+    }
+    .btn-outline-light {
+      border-radius: .75rem;
+    }
+    /* Form controls */
+    form label {
+      font-weight: 500;
+      font-size: 0.95rem;
+      margin-bottom: 0.25rem;
+    }
+    form input,
+    form select,
+    form textarea {
+      background: rgba(15,23,42,0.85);
+      border-radius: 0.9rem;
+      border: 1px solid rgba(148,163,184,0.6);
+      color: #e5e7eb;
+      padding: 0.6rem 0.9rem;
+      font-size: 0.95rem;
+    }
+    form input:focus,
+    form select:focus,
+    form textarea:focus {
+      outline: none;
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.4);
+    }
+    .form-text {
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+    .text-danger {
+      font-size: 0.8rem;
+    }
+    input[type="file"] {
+  background: rgba(15,23,42,0.85);
+  border-radius: 0.9rem;
+  border: 1px solid rgba(148,163,184,0.6);
+  color: #e5e7eb;
+  padding: 0.4rem;
+  font-size: 0.9rem;
+}
+
+  </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark px-4 py-3">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold fs-4" href="{% url 'event_list' %}">Vaqueros Meets</a>
+
+    <div class="ms-auto d-flex align-items-center gap-3">
+      <a href="{% url 'profile' %}" class="text-decoration-none text-white">
+        <div class="profile-circle">{{ initial }}</div>
+      </a>
+
+      <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">
+        Sign out
+      </a>
+    </div>
+  </div>
+</nav>
+
+<div class="container page-wrapper">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+
+      <!-- Back to events -->
+      <a href="{% url 'event_list' %}" class="btn btn-outline-light btn-sm mb-3">
+        ← Back to events
+      </a>
+
+      <div class="form-card">
+        <h1 class="form-title">Create Event</h1>
+        <p class="form-subtitle">
+          Set up the details for your new event so people can discover and RSVP.
+        </p>
+
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger py-2">
+              {{ form.non_field_errors }}
+            </div>
+          {% endif %}
+
+<!-- Title -->
+<div class="mb-3">
+  <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+  {{ form.title }}
+  {% for error in form.title.errors %}
+    <div class="text-danger">{{ error }}</div>
+  {% endfor %}
+</div>
+
+<!-- Description -->
+<div class="mb-3">
+  <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+  {{ form.description }}
+  {% for error in form.description.errors %}
+    <div class="text-danger">{{ error }}</div>
+  {% endfor %}
+</div>
+
+<!-- Event image upload -->
+<div class="mb-3">
+  <label for="{{ form.image.id_for_label }}">{{ form.image.label }}</label>
+  {{ form.image }}
+  {% for error in form.image.errors %}
+    <div class="text-danger">{{ error }}</div>
+  {% endfor %}
+  <div class="form-text">
+    Optional — upload a banner or flyer for your event.
+  </div>
+</div>
+
+<!-- Date & Time -->
+<div class="mb-3">
+  <label for="{{ form.starts_at.id_for_label }}">{{ form.starts_at.label }}</label>
+  {{ form.starts_at }}
+  {% for error in form.starts_at.errors %}
+    <div class="text-danger">{{ error }}</div>
+  {% endfor %}
+</div>
+
+<!-- Location -->
+<div class="mb-3">
+  <label for="{{ form.location.id_for_label }}">{{ form.location.label }}</label>
+  {{ form.location }}
+  {% for error in form.location.errors %}
+    <div class="text-danger">{{ error }}</div>
+  {% endfor %}
+</div>
+
+<!-- Capacity -->
+<div class="mb-3">
+  <label for="{{ form.capacity.id_for_label }}">{{ form.capacity.label }}</label>
+  {{ form.capacity }}
+  {% for error in form.capacity.errors %}
+    <div class="text-danger">{{ error }}</div>
+  {% endfor %}
+</div>
+
+<!-- Visibility -->
+<div class="mb-3">
+  <label for="{{ form.visibility.id_for_label }}">{{ form.visibility.label }}</label>
+  {{ form.visibility }}
+  {% for error in form.visibility.errors %}
+    <div class="text-danger">{{ error }}</div>
+  {% endfor %}
+</div>
+
+<!-- Interests -->
+<div class="mb-3">
+  <label>{{ form.interests.label }}</label>
+  {{ form.interests }}
+  {% for error in form.interests.errors %}
+    <div class="text-danger">{{ error }}</div>
+  {% endfor %}
+</div>
+
+
+          <div class="d-flex justify-content-between align-items-center mt-4">
+            <a href="{% url 'event_list' %}" class="btn btn-outline-light">
+              Cancel
+            </a>
+            <button type="submit" class="btn btn-primary">
+              Create Event
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

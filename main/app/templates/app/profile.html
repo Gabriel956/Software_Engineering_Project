@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Profile — {{ profile.user.username }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+
+  <style>
+    body {
+      background: linear-gradient(135deg, #0f172a, #020617);
+      min-height: 100vh;
+      font-family: Poppins, system-ui, sans-serif;
+      color: white;
+    }
+
+    .top-header {
+      height: 90px;
+      background: rgba(15,23,42,.95);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,.4);
+    }
+
+    .brand-link {
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .profile-circle {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+
+    .avatar-box {
+      width: 160px;
+      height: 160px;
+      border-radius: 1rem;
+      background: linear-gradient(135deg, #111827, #1f2933);
+      box-shadow: 0 20px 40px rgba(0,0,0,.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      font-weight: 700;
+      color: rgba(255,255,255,.7);
+    }
+
+    .profile-card {
+      background: rgba(255,255,255,0.06);
+      border-radius: 1.75rem;
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 30px 60px rgba(0,0,0,.5);
+      backdrop-filter: blur(16px);
+      padding: 2.5rem;
+    }
+
+    .section-title {
+      font-weight: 600;
+      margin-bottom: .6rem;
+    }
+
+    .info-box {
+      background: rgba(255,255,255,.08);
+      border-radius: .75rem;
+      padding: 1rem 1.25rem;
+      font-size: 0.95rem;
+    }
+
+    .badge-interest {
+      background: rgba(148,163,184,.9);
+      border-radius: 999px;
+      padding: 0.25rem 0.8rem;
+      font-size: 0.8rem;
+      margin-right: 0.4rem;
+      margin-bottom: 0.4rem;
+      display: inline-block;
+    }
+
+    .event-link {
+      color: #e5e7eb;
+      text-decoration: none;
+    }
+
+    .event-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="top-header">
+  <a href="{% url 'event_list' %}" class="brand-link">Vaqueros Meets</a>
+
+  <div class="d-flex align-items-center gap-3">
+    <a href="{% url 'profile' %}" class="text-decoration-none text-white">
+      <div class="profile-circle">{{ initial }}</div>
+    </a>
+    <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">
+      Sign out
+    </a>
+  </div>
+</div>
+
+<div class="container py-5">
+  <div class="row g-4 align-items-center">
+
+    <!-- Avatar + basic info -->
+    <div class="col-md-4 text-center">
+      <div class="avatar-box mx-auto">
+        {{ initial }}
+      </div>
+      <div class="mt-3">
+        <h3 class="mb-1">
+          {{ profile.display_name|default:profile.user.username }}
+        </h3>
+        <small class="text-secondary">
+          @{{ profile.user.username }}
+        </small>
+      </div>
+
+      <div class="mt-3">
+        <a href="{% url 'edit_profile' %}" class="btn btn-outline-light btn-sm">
+          Edit profile
+        </a>
+      </div>
+    </div>
+
+    <!-- Bio / Interests / Events -->
+    <div class="col-md-8">
+      <div class="profile-card">
+
+        <!-- Bio -->
+        <div class="mb-4">
+          <div class="section-title">Bio</div>
+          <div class="info-box">
+            {% if profile.bio %}
+              {{ profile.bio|linebreaksbr }}
+            {% else %}
+              <span class="text-secondary">You haven't added a bio yet.</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Interests -->
+        <div class="mb-4">
+          <div class="section-title">Interests</div>
+          <div class="info-box">
+            {% if profile.interests.all %}
+              {% with interests=profile.interests.all %}
+                {% if interests %}
+                  {% for interest in interests %}
+                    <span class="badge-interest">{{ interest.name }}</span>
+                  {% endfor %}
+                {% else %}
+                  <span class="text-secondary">No interests selected yet.</span>
+                {% endif %}
+              {% endwith %}
+            {% else %}
+              <span class="text-secondary">No interests selected yet.</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Events Attending -->
+        <div>
+          <div class="section-title">Events Attending</div>
+          <div class="info-box">
+            {% if attending_rsvps %}
+              <ul class="list-unstyled mb-0">
+                {% for rsvp in attending_rsvps %}
+                  <li class="mb-1">
+                    <a href="{% url 'event_detail' rsvp.event.id %}" class="event-link">
+                      {{ rsvp.event.title }}
+                    </a>
+                    <small class="d-block text-secondary">
+                      {{ rsvp.event.starts_at|date:"M d, Y" }} at {{ rsvp.event.starts_at|time:"g:i A" }}
+                    </small>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <span class="text-secondary">
+                You haven't RSVPed "Going" to any events yet.
+              </span>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  gsap.from(".top-header", { y:-80, opacity:0, duration:1 });
+  gsap.from(".avatar-box", { x:-40, opacity:0, duration:1, delay:.2 });
+  gsap.from(".profile-card", { x:40, opacity:0, duration:1, delay:.3 });
+  gsap.from(".info-box", { opacity:0, y:15, stagger:.15, delay:.6 });
+</script>
+
+</body>
+</html>

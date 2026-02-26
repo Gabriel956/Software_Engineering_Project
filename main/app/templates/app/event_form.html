@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create Event — InTheWorks</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0f172a, #020617);
+      color: #fff;
+      min-height: 100vh;
+    }
+    .navbar {
+      background: rgba(15, 23, 42, 0.95);
+      box-shadow: 0 10px 30px rgba(0,0,0,.4);
+    }
+    .profile-circle {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+    .page-wrapper {
+      padding-top: 4rem;
+      padding-bottom: 4rem;
+    }
+    .form-card {
+      background: rgba(255,255,255,0.06);
+      border-radius: 1.75rem;
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 30px 60px rgba(0,0,0,.45);
+      backdrop-filter: blur(16px);
+      padding: 2.5rem 2.25rem;
+    }
+    .form-title {
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .form-subtitle {
+      opacity: .8;
+      font-size: 0.95rem;
+      margin-bottom: 1.75rem;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      border: none;
+      border-radius: .9rem;
+      padding: .7rem 1.6rem;
+      font-weight: 600;
+    }
+    .btn-primary:hover {
+      filter: brightness(1.1);
+    }
+    .btn-outline-light {
+      border-radius: .75rem;
+    }
+    form label {
+      font-weight: 500;
+      font-size: 0.95rem;
+      margin-bottom: 0.25rem;
+    }
+    form input,
+    form select,
+    form textarea {
+      background: rgba(15,23,42,0.85);
+      border-radius: 0.9rem;
+      border: 1px solid rgba(148,163,184,0.6);
+      color: #e5e7eb;
+      padding: 0.6rem 0.9rem;
+      font-size: 0.95rem;
+      width: 100%;
+    }
+    form input:focus,
+    form select:focus,
+    form textarea:focus {
+      outline: none;
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.4);
+    }
+    .form-text {
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+    .text-danger {
+      font-size: 0.8rem;
+    }
+
+        .interests-wrapper {
+      max-height: 180px;
+      overflow-y: auto;
+      padding: 0.6rem 0.8rem;
+      background: rgba(15,23,42,.85);
+      border-radius: .75rem;
+      border: 1px solid rgba(148,163,184,.6);
+      font-size: 13px;
+    }
+
+    .interest-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .interest-chip {
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+      border-radius: 999px;
+      background: rgba(15,23,42,.85);
+      border: 1px solid rgba(148,163,184,.7);
+      padding: 0.25rem 0.75rem;
+      font-size: 12px;
+      color: #e5e7eb;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+    }
+
+    .interest-chip input[type="checkbox"] {
+      display: none;
+    }
+
+    .interest-chip.active {
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      border-color: #38bdf8;
+      color: #0b1220;
+      transform: translateY(-1px);
+    }
+
+  </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark px-4 py-3">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold fs-4" href="{% url 'event_list' %}">Vaqueros Meets</a>
+
+    <div class="ms-auto d-flex align-items-center gap-3">
+      <a href="{% url 'profile' %}" class="text-decoration-none text-white">
+        <div class="profile-circle">{{ initial }}</div>
+      </a>
+
+      <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">
+        Sign out
+      </a>
+    </div>
+  </div>
+</nav>
+
+<div class="container page-wrapper">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+
+      <!-- Back to events -->
+      <a href="{% url 'event_list' %}" class="btn btn-outline-light btn-sm mb-3">
+        ← Back to events
+      </a>
+
+      <div class="form-card">
+        <h1 class="form-title">Create Event</h1>
+        <p class="form-subtitle">
+          Set up the details for your new event so people can discover and RSVP.
+        </p>
+
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger py-2">
+              {{ form.non_field_errors }}
+            </div>
+          {% endif %}
+
+{% for field in form %}
+  {% if field.name == "interests" %}
+    <div class="mb-3">
+      <label>{{ field.label }}</label>
+      <div class="interests-wrapper">
+        <div class="interest-chips">
+          {% for checkbox in field %}
+            <label class="interest-chip
+                          {% if checkbox.choice_value in field.value %}
+                            active
+                          {% endif %}">
+              {{ checkbox.tag }}
+              <span>{{ checkbox.choice_label }}</span>
+            </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      {% if field.help_text %}
+        <div class="form-text">
+          {{ field.help_text }}
+        </div>
+      {% endif %}
+
+      {% for error in field.errors %}
+        <div class="text-danger">
+          {{ error }}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="mb-3">
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {{ field }}
+
+      {% if field.help_text %}
+        <div class="form-text">
+          {{ field.help_text }}
+        </div>
+      {% endif %}
+
+      {% for error in field.errors %}
+        <div class="text-danger">
+          {{ error }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endfor %}
+
+
+          <div class="d-flex justify-content-between align-items-center mt-4">
+            <a href="{% url 'event_list' %}" class="btn btn-outline-light">
+              Cancel
+            </a>
+            <button type="submit" class="btn btn-primary">
+              Create Event
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".interest-chip input[type='checkbox']").forEach(function (input) {
+      const chip = input.closest(".interest-chip");
+      const updateState = () => {
+        if (input.checked) {
+          chip.classList.add("active");
+        } else {
+          chip.classList.remove("active");
+        }
+      };
+      // Initial state (for form re-renders with errors)
+      updateState();
+      // Toggle on change
+      input.addEventListener("change", updateState);
+    });
+  });
+</script>
+
+</body>
+</html>

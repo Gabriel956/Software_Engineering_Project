@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>InTheWorks — Edit Profile</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+
+  <style>
+    body {
+      background: linear-gradient(135deg, #0f172a, #020617);
+      min-height: 100vh;
+      font-family: Poppins, system-ui, sans-serif;
+      color: white;
+    }
+
+    .top-header {
+      height: 90px;
+      background: rgba(15,23,42,.95);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,.4);
+    }
+
+    .brand-link {
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .profile-circle {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+
+    .page-wrap {
+      min-height: calc(100vh - 90px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .edit-card {
+      width: 100%;
+      max-width: 480px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 1.75rem;
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 30px 60px rgba(0,0,0,.5);
+      backdrop-filter: blur(16px);
+      padding: 2.5rem 2.75rem;
+    }
+
+    .title {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 1.8rem;
+      text-align: center;
+    }
+
+    .field-label {
+      font-size: 13px;
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+
+    .edit-card input[type="text"],
+    .edit-card textarea {
+      background: rgba(15,23,42,.85);
+      border: 1px solid rgba(148,163,184,.6);
+      border-radius: .75rem;
+      box-shadow: none;
+      padding: 0.65rem 0.9rem;
+      font-size: 14px;
+      color: #e5e7eb;
+    }
+
+    .edit-card textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .edit-card input[type="text"]::placeholder,
+    .edit-card textarea::placeholder {
+      color: rgba(148,163,184,.8);
+    }
+
+    .errorlist {
+      color: #fca5a5;
+      list-style: none;
+      padding-left: 0;
+      margin-bottom: 0.25rem;
+      font-size: 12px;
+    }
+
+    .interests-wrapper {
+      max-height: 180px;
+      overflow-y: auto;
+      padding: 0.6rem 0.8rem;
+      background: rgba(15,23,42,.85);
+      border-radius: .75rem;
+      border: 1px solid rgba(148,163,184,.6);
+      font-size: 13px;
+    }
+    .interest-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.interest-chip {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 999px;
+  background: rgba(15,23,42,.85);
+  border: 1px solid rgba(148,163,184,.7);
+  padding: 0.25rem 0.75rem;
+  font-size: 12px;
+  color: #e5e7eb;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.interest-chip:hover {
+  border-color: #93c5fd;
+  transform: translateY(-1px);
+}
+
+/* Hide raw checkbox but keep it functional */
+.interest-chip input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* When checked, turn the chip into a colored bubble */
+.interest-chip input[type="checkbox"]:checked + span {
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  color: #0b1220;
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem;
+}
+
+
+    .btn-primary-custom {
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      color: white;
+      border: none;
+      border-radius: .75rem;
+      padding: 0.6rem 1.6rem;
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 0.5rem;
+    }
+
+    .back-link {
+      margin-top: 12px;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .back-link a {
+      color: #93c5fd;
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="top-header">
+  <a href="{% url 'event_list' %}" class="brand-link">Vaqueros Meets</a>
+
+  <div class="d-flex align-items-center gap-3">
+    <a href="{% url 'profile' %}" class="text-decoration-none text-white">
+      <div class="profile-circle">{{ initial }}</div>
+    </a>
+    <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">
+      Sign out
+    </a>
+  </div>
+</div>
+
+<div class="page-wrap">
+  <div class="edit-card">
+    <h1 class="title">Edit Profile</h1>
+
+    <form method="post">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+
+      <!-- Display Name -->
+      <div class="mb-3">
+        <div class="field-label">
+          {{ form.display_name.label_tag }}
+        </div>
+        {{ form.display_name.errors }}
+        {{ form.display_name }}
+      </div>
+
+      <!-- Bio -->
+      <div class="mb-3">
+        <div class="field-label">
+          {{ form.bio.label_tag }}
+        </div>
+        {{ form.bio.errors }}
+        {{ form.bio }}
+      </div>
+
+      <!-- Interests -->
+<!-- Interests as bubbles -->
+<div class="mb-3">
+  <div class="field-label">
+    {{ form.interests.label }}
+  </div>
+  {{ form.interests.errors }}
+  <div class="interests-wrapper">
+    <div class="interest-chips">
+      {% for checkbox in form.interests %}
+        <label class="interest-chip">
+          {{ checkbox.tag }}
+          <span>{{ checkbox.choice_label }}</span>
+        </label>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+
+      <button type="submit" class="btn-primary-custom">
+        Save Changes
+      </button>
+    </form>
+
+    <div class="back-link">
+      <a href="{% url 'profile' %}">← Back to profile</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  gsap.from(".top-header", { y:-80, opacity:0, duration:1 });
+  gsap.from(".edit-card", { y:40, opacity:0, duration:1, delay:.2 });
+</script>
+
+</body>
+</html>

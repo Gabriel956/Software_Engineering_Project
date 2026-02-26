@@ -1,53 +1,111 @@
-# Software_Engineering_Project
+# Vaquero Meets
 
-App name: in the works
+Vaquero Meets is a Django-based social event application that allows users to create, discover, and interact with events based on shared interests. The app focuses on a modern, consistent user experience with smart filtering, RSVP tracking, comments, and event images.
 
-Description: 
-An online social network that helps people find and connect with others who have similar interests. Find or create events based on the user's hobbies, lifestyle, or passions, such as local hangouts, community activities, or group meetups.
+**Current Branch:** `frontend-1`
 
-Using categories and keywords, the app helps users discover nearby gatherings, such as sports games, study groups, music sessions, or casual get-togethers. Detailed information about each event, including the date, time, location, and participant limit, allows users to RSVP, comment, and communicate with others.
+---
 
-Framework: Django?
+## Features
 
-github repo: created
+### Event Management
+- Create, edit, and view events
+- Upload event images
+- Set event details (date, time, location, capacity, visibility)
+- Edit events only if you are the event owner
 
-list of features:
-User Profiles
--Create and manage personal profiles
--Select interests or categories (e.g., sports, music, gaming)
--Upload profile picture and short bio
+### Event Discovery
+- Event list with modern glassmorphism UI
+- Sort events by:
+  - Soonest upcoming
+  - Furthest future
+  - Title (A–Z)
+- Interest-based filtering with multi-select chips
+- Smart default filtering based on user profile interests
+- Clear filters without losing sort state
 
-Event Discovery
--Search or filter events by category, location, or keywords
--Sort by upcoming events or distance
--View event details on a map or list view
+### RSVP System
+- RSVP statuses: Going, Maybe, Not Going
+- RSVP state updates per event
+- Attendee list displayed on event detail page
 
-Join / RSVP System
--Users can “Join,” “Maybe,” or “Decline” an event
--Event hosts can see the attendee list
--Limit attendance if capacity is reached
+### Comments
+- Post comments on events
+- Edit and delete your own comments
+- Author-only permissions enforced
 
-Planning:
-Sprint 1: Project Setup & Organization
-Duration: Oct 10 – Oct 17
-Goals:
--Initialize GitHub repository
--Set up development environment (Django project, virtual environment,  dependencies)
--Create a detailed list of planned features
--Assign and document team roles
-Deliverables:
--GitHub repo with README.md 
--Feature list file or shared document
+### Profiles
+- User profiles with display name and interests
+- Profile interest chips reused across the app
+- Profile initials shown in navigation bar
 
-Sprint 2: UI Mockups & User System
-Duration: Oct 18 – Nov 1
-Goals:
-Design user interface mockups
-Build and connect the user database?
+### UI & UX
+- Consistent navigation across all pages
+- Glassmorphism design style
+- Responsive layout using Bootstrap
+- Subtle animations with GSAP
 
-Sprint 3: 
-Duration: Nov 
+---
 
+## Technologies Used
 
-admin
-admin956
+### Backend
+- **Python**
+- **Django**
+- Django ORM (Object-Relational Mapper)
+
+### Frontend
+- **HTML**
+- **CSS (custom glassmorphism styling)**
+- **Bootstrap 5**
+- **JavaScript**
+- **GSAP (GreenSock Animation Platform)**
+
+### Database
+- **SQLite** (development database)
+
+### Media Handling
+- **Pillow** (image uploads)
+- Django media file handling (`MEDIA_ROOT`, `MEDIA_URL`)
+
+---
+
+## Project Architecture
+
+The application follows Django’s **Model–View–Template (MVT)** architecture:
+
+- **Models**: Define database structure (Events, Interests, RSVPs, Comments, Profiles)
+- **Views**: Handle application logic and user requests
+- **Templates**: Render dynamic HTML pages
+- **Forms**: Validate and process user input using Django Forms and ModelForms
+
+---
+
+## Authentication & Permissions
+
+- Django’s built-in authentication system
+- Login and logout functionality
+- Permission checks ensure:
+  - Only event owners can edit events
+  - Only comment authors can edit or delete their comments
+- CSRF protection enabled for all forms
+
+---
+
+## Admin Access (Development)
+
+> ⚠️ **For development/testing only**
+
+- **Admin URL:** `/admin/`
+- **Username:** `admin`
+- **Password:** `admin956`
+
+---
+
+## Running the Project Locally
+
+1. Clone the repository
+2. Create and activate a virtual environment
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
